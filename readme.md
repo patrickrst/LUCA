@@ -5,13 +5,6 @@ LUCA
 The **LEGO Universe Creation (Lab) Archiver** is a command-line tool to backup creations uploaded to the [LEGO Universe Creation Lab](http://universe.lego.com/en-us/community/creationlab/displaychallengelist.aspx). 
 
 
-TODO
-----
-* Filter input/handle errors
-* Distinguish between images, videos and LDD files
-* Work without the memberid 
-
-
 Prerequisites
 -------------
 * Tested under Windows (Unknown if it will work on Linux or OS X)
