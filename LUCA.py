@@ -1,17 +1,27 @@
 import os
+import sys
 import requests
 from bs4 import BeautifulSoup
 
 
 memberid = input("Enter your memberid:")
 userName = input("Enter your username:")
-os.makedirs(userName)
+
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid=%s&show=48" % memberid
 
 
 r = requests.get(url)
 status = r.status_code
+
+if status != 200:
+	print(status)
+	print("Not a valid URL")
+	input("Press Enter to continue...")
+	sys.exit(1)
+	
+
+os.makedirs(userName)
 creationList = r.content
 soup = BeautifulSoup(creationList)
 
