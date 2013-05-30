@@ -4,8 +4,37 @@ import requests
 from bs4 import BeautifulSoup
 
 
-memberid = input("Enter your memberid:")
-userName = input("Enter your username:")
+
+userName = input("Enter your Creation Lab username: ")
+
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText=%s&order=oldest&show=12" % userName
+r = requests.get(url).content
+soup = BeautifulSoup(r)
+
+
+creations = []
+for link in soup.find_all('a'): 
+	if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
+		creations.append('http://universe.lego.com' + link.get('href'))
+		
+
+		
+r = requests.get(creations[0]).content
+soup = BeautifulSoup(r)
+
+onlineName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+print(onlineName)
+
+if userName == onlineName.string:
+	memberid = onlineName.get('href')[63:99]
+	print(memberid)
+
+		
+
+		
+
+	
+
 
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid=%s&show=48" % memberid
@@ -30,6 +59,7 @@ creations = []
 for link in soup.find_all('a'): 
 	if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
 		creations.append('http://universe.lego.com' + link.get('href'))
+		
 
 	
 
