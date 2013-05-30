@@ -11,7 +11,6 @@ Prerequisites
 * Python 3.3
 * [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/)
 * [Requests](http://docs.python-requests.org/en/latest/)
-* Your Creation Lab memberid, can be found in the URL (universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid= **fc4e9adb-e23c-4138-82b3-87e24b50e6f8** ) of your Creation Lab profile (just do a search for your username). 
 
 
 Author
