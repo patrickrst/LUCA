@@ -6,6 +6,7 @@ TODO
 * [x] Work with username as an input (instead of memberid)
 * [ ] Add creation comments to the HTML file
 * [ ] Create stylesheet
+* [ ] Add a progress bar
 
 ###Legend
 * [ ] ---> Todo
