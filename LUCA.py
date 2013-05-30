@@ -4,64 +4,43 @@ import requests
 from bs4 import BeautifulSoup
 
 
+localUserName = input("Enter your Creation Lab username: ")
 
-userName = input("Enter your Creation Lab username: ")
 
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText=%s&order=oldest&show=12" % userName
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText=%s&order=oldest&show=12" % localUserName
 r = requests.get(url).content
 soup = BeautifulSoup(r)
-
-
 creations = []
 for link in soup.find_all('a'): 
 	if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
 		creations.append('http://universe.lego.com' + link.get('href'))
 		
 
-		
 r = requests.get(creations[0]).content
 soup = BeautifulSoup(r)
+onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+if localUserName == onlineUserName.string:
+	memberid = onlineUserName.get('href')[63:99]
+else:
+	print("The username your enter does not match with the one online.")
+	input("Press Enter to close the program...")
+	sys.exit(1)	
 
-onlineName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
-print(onlineName)
 
-if userName == onlineName.string:
-	memberid = onlineName.get('href')[63:99]
-	print(memberid)
-
-		
-
-		
-
-	
 
 
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid=%s&show=48" % memberid
+r = requests.get(url).content
+soup = BeautifulSoup(r)
+os.makedirs(localUserName)
 
-
-r = requests.get(url)
-status = r.status_code
-
-if status != 200:
-	print(status)
-	print("Not a valid URL")
-	input("Press Enter to continue...")
-	sys.exit(1)
-	
-
-os.makedirs(userName)
-creationList = r.content
-soup = BeautifulSoup(creationList)
 
 creations = []
-
 for link in soup.find_all('a'): 
 	if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
 		creations.append('http://universe.lego.com' + link.get('href'))
 		
-
-	
 
 for creation in creations:
 
