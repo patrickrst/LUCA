@@ -1,10 +1,13 @@
+#! /usr/bin/python3
+
 import os
 import sys
 import requests
 from bs4 import BeautifulSoup
 
-
-localUserName = input("Enter your Creation Lab username: ")
+# Write window title
+os.system("title LUCA v0.2")
+localUserName = input("\nEnter your Creation Lab username: ")
 
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText=%s&order=oldest&show=12" % localUserName
@@ -23,8 +26,8 @@ if localUserName == onlineUserName.string:
 	memberid = onlineUserName.get('href')[63:99]
 else:
 	print("The username your enter does not match with the one online.")
-	input("Press Enter to close the program...")
-	sys.exit(1)	
+	input("Press Enter to close LUCA.")
+	raise SystemExit(1)	
 
 
 
@@ -66,6 +69,7 @@ for creation in creations:
 	<head>
 	<meta charset="utf-8" />
 	<title>%s</title>
+	</head>
 	<body>
 	%s
 	%s
@@ -90,13 +94,13 @@ for creation in creations:
 	for imgLink in imgT:
 		r = requests.get(imgLink)
 		img = r.content
-		filename = 'hobino/' + titleT + str(i) + '.jpg'          
+		filename = localUserName + '/' + titleT + str(i) + '.jpg'          
 		newImg = open(filename, 'wb')
 		newImg.write(img)
 		newImg.close()
 		i = i + 1
 		
-	newHTML = open('hobino/' + titleT + '.html', 'w')
+	newHTML = open(localUserName + '/' + titleT + '.html', 'w')
 	newHTML.write(page)
 	newHTML.close()
 	
