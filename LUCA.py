@@ -68,17 +68,17 @@ for creation in creations:
 	<html lang="en">
 	<head>
 	<meta charset="utf-8" />
-	<title>%s</title>
+	<title>{0}</title>
 	</head>
 	<body>
-	%s
-	%s
-	%s
-	%s
-	%s
+	{1}
+	{2}
+	{3}
+	{4}
+	{5}
 	</body>
 	</html>
-	''' %(titleT, title, description, tags, challenge, date)
+	'''.format(titleT, title, description, tags, challenge, date)
 
 	# Old code
 	#imgM = soup.find("a", id="ctl00_ContentPlaceHolderUniverse_HyperLinkMainImage").get('href')
