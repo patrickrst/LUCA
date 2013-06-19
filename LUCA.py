@@ -30,7 +30,7 @@ minver = ""
 
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
-localUserName = input("\nEnter your Creation Lab username: ")
+localUserName = input("\nEnter your Creation Lab Username: ")
 
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(localUserName)
@@ -61,8 +61,11 @@ else:
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
-# Create folder to save files in
-os.makedirs(localUserName)
+
+# Create folder to save files in,
+# unless it already exists
+if not os.path.exists(localUserName):
+    os.mkdir(localUserName)
 
 
 creations = []
@@ -89,21 +92,20 @@ for creation in creations:
     date.div.decompose()
     date.a.decompose()
     
-    page = '''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta charset="utf-8" />
-    <title>{0}</title>
-    </head>
-    <body>
-    {1}
-    {2}
-    {3}
-    {4}
-    {5}
-    </body>
-    </html>
+    page = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{0}</title>
+</head>
+<body>
+{1}
+{2}
+{3}
+{4}
+{5}
+</body>
+</html>
     '''.format(titleT, title, description, tags, challenge, date)
 
     # Old code
@@ -120,10 +122,12 @@ for creation in creations:
     for imgLink in imgT:
         r = requests.get(imgLink)
         img = r.content
-        filename = localUserName + '/' + titleT + str(i) + '.jpg'          
-        newImg = open(filename, 'wb')
-        newImg.write(img)
-        newImg.close()
+        filename = localUserName + '/' + titleT + str(i) + '.jpg'
+        with open(filename, 'wb') as newImg:
+            newImg.write(img)
+        #newImg = open(filename, 'wb')
+        #newImg.write(img)
+        #newImg.close()
         i = i + 1
 
     # Write HTML document

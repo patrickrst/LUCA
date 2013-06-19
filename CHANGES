@@ -20,6 +20,9 @@ LUCA Changes
 * Added global variables containing program name and version
 * Added GPL block to `LUCA.py` and `setup.py`
 * Added a few script comments
+* Improved layout of written HTML document
+* If download folder does not exist, make it. Otherwise, start the download
+* Converted non-HTML file writing to use recommended `with` handle
 
 0.2
 ---
