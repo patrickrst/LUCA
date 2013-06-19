@@ -1,12 +1,31 @@
 #! /usr/bin/python3
 
+"""
+    This file is part of LUCA.
+
+    LUCA - LEGO Universe Creation (Lab) Archiver
+    Created 2013 Brickever <http://systemonbrick.wordpress.com/>
+
+    LUCA is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    LUCA is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with LUCA If not, see <http://www.gnu.org/licenses/>.
+"""
 import os
 import sys
 import requests
 from bs4 import BeautifulSoup
 
 app = "LUCA"
-majver = "0.2"
+majver = "0.3"
 minver = ""
 
 # Write window title
@@ -42,6 +61,7 @@ else:
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
+# Create folder to save files in
 os.makedirs(localUserName)
 
 
@@ -106,7 +126,8 @@ for creation in creations:
         newImg.close()
         i = i + 1
 
-    with open(localUserName + '/' + titleT + '.html', 'w') as newHTML:    
+    # Write HTML document
+    with open(localUserName + '/' + titleT + '.html', 'wt') as newHTML:    
         newHTML.write(page)
     #newHTML = open(localUserName + '/' + titleT + '.html', 'w')
     #newHTML.write(page)
