@@ -10,7 +10,7 @@ os.system("title LUCA v0.2")
 localUserName = input("\nEnter your Creation Lab username: ")
 
 
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText=%s&order=oldest&show=12" % localUserName
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(localUserName)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 creations = []
@@ -33,7 +33,7 @@ else:
 
 
 
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid=%s&show=48" % memberid
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 os.makedirs(localUserName)
