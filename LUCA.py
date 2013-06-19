@@ -25,7 +25,9 @@ onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsernam
 if localUserName == onlineUserName.string:
     memberid = onlineUserName.get('href')[63:99]
 else:
-    print("The username your enter does not match with the one online.")
+    # The username entered could not be found online
+    # TODO: update message to include onlineUserName or memberid?
+    print('The username "{0}" does not match with the one online.'.format(localUserName))
     input("Press Enter to close LUCA.")
     raise SystemExit(1) 
 
