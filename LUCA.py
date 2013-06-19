@@ -52,7 +52,7 @@ else:
     # TODO: update message to include onlineUserName or memberid?
     print('The username "{0}" does not match with the one online.'.format(localUserName))
     input("Press Enter to close LUCA.")
-    raise SystemExit(1) 
+    raise SystemExit(0) 
 
 
 
@@ -122,7 +122,9 @@ for creation in creations:
     for imgLink in imgT:
         r = requests.get(imgLink)
         img = r.content
-        filename = localUserName + '/' + titleT + str(i) + '.jpg'
+        # Write all non HTML files.
+        filename = os.path.join(localUserName, titleT) + "{0}.jpg".format(i)
+        #filename = localUserName + '/' + titleT + str(i) + '.jpg'
         with open(filename, 'wb') as newImg:
             newImg.write(img)
         #newImg = open(filename, 'wb')
@@ -130,12 +132,25 @@ for creation in creations:
         #newImg.close()
         i = i + 1
 
-    # Write HTML document
-    with open(localUserName + '/' + titleT + '.html', 'wt') as newHTML:    
+    # Write HTML documents.
+    HTMLfilename = "{0}.html".format(os.path.join(localUserName, titleT))
+    with open(HTMLfilename, "wt") as newHTML:
         newHTML.write(page)
     #newHTML = open(localUserName + '/' + titleT + '.html', 'w')
     #newHTML.write(page)
     #newHTML.close()
+
+# Get list of all downloaded files
+num_of_files = os.listdir(os.path.join(os.getcwd(), localUserName))
+# Remove Thumbs.db from list
+if "Thumbs.db" in num_of_files:
+    num_of_files.remove("Thumbs.db")
+
+# Display success message containing number
+# of files downloaded and where they were saved.
+print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(len(num_of_files), os.path.join(os.getcwd(), localUserName)))
+input("\nPress Enter to close LUCA.\n")
+raise SystemExit(0)
     
 
 

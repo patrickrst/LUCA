@@ -23,6 +23,11 @@ LUCA Changes
 * Improved layout of written HTML document
 * If download folder does not exist, make it. Otherwise, start the download
 * Converted non-HTML file writing to use recommended `with` handle
+* Fixed exit code number when closing the program
+* Cleaned up saving path for both HTML and non-HTML files
+* Added "Successful Download" message
+* Added number of files downloaded into "Successful Download" message
+* Added exit routine after finishing the download
 
 0.2
 ---
