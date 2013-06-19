@@ -5,8 +5,12 @@ import sys
 import requests
 from bs4 import BeautifulSoup
 
+app = "LUCA"
+majver = "0.2"
+minver = ""
+
 # Write window title
-os.system("title LUCA v0.2")
+os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab username: ")
 
 
