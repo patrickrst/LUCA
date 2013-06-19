@@ -99,10 +99,12 @@ for creation in creations:
         newImg.write(img)
         newImg.close()
         i = i + 1
-        
-    newHTML = open(localUserName + '/' + titleT + '.html', 'w')
-    newHTML.write(page)
-    newHTML.close()
+
+    with open(localUserName + '/' + titleT + '.html', 'w') as newHTML:    
+        newHTML.write(page)
+    #newHTML = open(localUserName + '/' + titleT + '.html', 'w')
+    #newHTML.write(page)
+    #newHTML.close()
     
 
 
