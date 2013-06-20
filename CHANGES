@@ -28,6 +28,8 @@ LUCA Changes
 * Added "Successful Download" message
 * Added number of files downloaded into "Successful Download" message
 * Added exit routine after finishing the download
+* Added message to inform user their files are downloading
+* Display list of downloaded file (LUCA's non-GUI version of a progress bar)
 
 0.2
 ---

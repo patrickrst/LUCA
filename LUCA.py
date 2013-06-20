@@ -21,6 +21,7 @@
 """
 import os
 import sys
+import time
 import requests
 from bs4 import BeautifulSoup
 
@@ -47,6 +48,7 @@ soup = BeautifulSoup(r)
 onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
 if localUserName == onlineUserName.string:
     memberid = onlineUserName.get('href')[63:99]
+    print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
 else:
     # The username entered could not be found online
     # TODO: update message to include onlineUserName or memberid?
@@ -145,6 +147,16 @@ num_of_files = os.listdir(os.path.join(os.getcwd(), localUserName))
 # Remove Thumbs.db from list
 if "Thumbs.db" in num_of_files:
     num_of_files.remove("Thumbs.db")
+
+# Print list of all files downloaded
+# This is LUCA's non-GUI version of a progress bar
+for file in num_of_files:
+    # Adds a slight delay between the file list
+    # Carefully tweaked to not be extremely long for lost of files
+    time.sleep(0.01)
+    print(file, end="\n")
+# Small pause before sucess message
+time.sleep(1)
 
 # Display success message containing number
 # of files downloaded and where they were saved.
