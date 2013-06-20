@@ -30,6 +30,7 @@ LUCA Changes
 * Added exit routine after finishing the download
 * Added message to inform user their files are downloading
 * Display list of downloaded file (LUCA's non-GUI version of a progress bar)
+* Updated "progress bar" to display filename as soon as it is downloaded, not after everything was downloaded
 
 0.2
 ---

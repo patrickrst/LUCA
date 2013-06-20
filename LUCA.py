@@ -51,7 +51,8 @@ if localUserName == onlineUserName.string:
     print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
 else:
     # The username entered could not be found online
-    # TODO: update message to include onlineUserName or memberid?
+    # TODO: update message to include onlineUserName or memberid,
+    # or does this mean the username does not exist?
     print('The username "{0}" does not match with the one online.'.format(localUserName))
     input("Press Enter to close LUCA.")
     raise SystemExit(0) 
@@ -129,34 +130,25 @@ for creation in creations:
         #filename = localUserName + '/' + titleT + str(i) + '.jpg'
         with open(filename, 'wb') as newImg:
             newImg.write(img)
-        #newImg = open(filename, 'wb')
-        #newImg.write(img)
-        #newImg.close()
+        # Display filename after it was installed, 
+        # part of LUCA's non-GUI progress bar.
+        print(os.path.basename(filename), end="\n")
         i = i + 1
 
     # Write HTML documents.
     HTMLfilename = "{0}.html".format(os.path.join(localUserName, titleT))
     with open(HTMLfilename, "wt") as newHTML:
         newHTML.write(page)
-    #newHTML = open(localUserName + '/' + titleT + '.html', 'w')
-    #newHTML.write(page)
-    #newHTML.close()
+    # Display filename after it was installed, 
+    # part of LUCA's non-GUI progress bar.
+    print(os.path.basename(HTMLfilename), end="\n")
+
 
 # Get list of all downloaded files
 num_of_files = os.listdir(os.path.join(os.getcwd(), localUserName))
 # Remove Thumbs.db from list
 if "Thumbs.db" in num_of_files:
     num_of_files.remove("Thumbs.db")
-
-# Print list of all files downloaded
-# This is LUCA's non-GUI version of a progress bar
-for file in num_of_files:
-    # Adds a slight delay between the file list
-    # Carefully tweaked to not be extremely long for lost of files
-    time.sleep(0.01)
-    print(file, end="\n")
-# Small pause before sucess message
-time.sleep(1)
 
 # Display success message containing number
 # of files downloaded and where they were saved.
