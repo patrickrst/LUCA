@@ -52,7 +52,7 @@ if not creations:
 r = requests.get(creations[0]).content
 soup = BeautifulSoup(r)
 onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
-if localUserName == onlineUserName.string:
+if localUserName.lower() == onlineUserName.string.lower():
     memberid = onlineUserName.get('href')[63:99]
     print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
 else:
