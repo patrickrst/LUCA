@@ -31,8 +31,8 @@ LUCA Changes
 * Added message to inform user their files are downloading
 * Display list of downloaded file (LUCA's non-GUI version of a progress bar)
 * Updated "progress bar" to display filename as soon as it is downloaded, not after everything was downloaded
-* Added error handling for when LUCA does not find any links when searching on the Creation Lab for an entered username
-* Updated: username entered are now case-insensitive.
+* Added error handling when LUCA does not find any links when searching on the Creation Lab for an entered username
+* Updated: usernames are now case-insensitive.
 
 0.2
 ---
