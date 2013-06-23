@@ -127,24 +127,50 @@ for creation in creations:
     for img in soup.find_all('a'):
         if img.get('href')[0:13] == "GetMedia.aspx":
             imgT.append('http://universe.lego.com/en-us/community/creationlab/'+ img.get('href'))
-        
+
+    # --- BEGIN NEW CODE --- #
+    # List of illegal characters for filenames
+    blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+    # Makes it easier to understand what is going on.
+    filepath = os.path.join(os.getcwd(), localUserName)
+    # --- END NEW CODE --- #
+
     for imgLink in imgT:
         r = requests.get(imgLink)
-        img = r.content
-        # Write all non HTML files.
-        filename = os.path.join(localUserName, titleT) + "{0}.jpg".format(i)
-        #filename = localUserName + '/' + titleT + str(i) + '.jpg'
-        with open(filename, 'wb') as newImg:
+        img = r.content            
+
+        # --- BEGIN NEW CODE --- #
+        # Original filename  
+        filename = "{0}{1}.jpg".format(titleT, i)
+        for char in blacklist:  
+            if char in filename:
+                # If an illegal character is found, replace it with a dash
+                filename = filename.replace(char, "-")
+
+
+        # Write all non HTML files.  
+        with open(os.path.join(filepath, filename), 'wb') as newImg:
             newImg.write(img)
+       # --- END NEW CODE --- #
+
         # Display filename after it was installed, 
         # part of LUCA's non-GUI progress bar.
         print(os.path.basename(filename), end="\n")
         i = i + 1
 
-    # Write HTML documents.
-    HTMLfilename = "{0}.html".format(os.path.join(localUserName, titleT))
-    with open(HTMLfilename, "wt") as newHTML:
+    # --- BEGIN NEW CODE --- #
+    # TODO: Is supposed to do the same thing as non-HTML stuff,
+    # but it fails for some reason.
+    HTMLfilename = "{0}.html".format(titleT)
+    for char in blacklist:  
+        if char in HTMLfilename:
+            filename = HTMLfilename.replace(char, "-")
+
+    # Write HTML documents.        
+    with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
+    # --- END NEW CODE --- #
+
     # Display filename after it was installed, 
     # part of LUCA's non-GUI progress bar.
     print(os.path.basename(HTMLfilename), end="\n")
