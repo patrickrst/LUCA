@@ -130,6 +130,20 @@ for creation in creations:
     filepath = os.path.join(os.getcwd(), localUserName)
 
 
+    HTMLfilename = "{0}.html".format(titleString)
+    for char in blacklist:  
+        if char in HTMLfilename:
+            HTMLfilename = HTMLfilename.replace(char, "-")
+
+    # Write HTML documents.        
+    with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
+        newHTML.write(page)
+
+    # Display filename after it was installed, 
+    # part of LUCA's non-GUI progress bar.
+    print(os.path.basename(HTMLfilename), end="\n")
+    
+    
     for imgLink in imgLinkList:
         r = requests.get(imgLink)
         img = r.content            
@@ -149,20 +163,6 @@ for creation in creations:
         # part of LUCA's non-GUI progress bar.
         print(os.path.basename(filename), end="\n")
         i = i + 1
-
-
-    HTMLfilename = "{0}.html".format(titleString)
-    for char in blacklist:  
-        if char in HTMLfilename:
-            HTMLfilename = HTMLfilename.replace(char, "-")
-
-    # Write HTML documents.        
-    with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
-        newHTML.write(page)
-
-    # Display filename after it was installed, 
-    # part of LUCA's non-GUI progress bar.
-    print(os.path.basename(HTMLfilename), end="\n")
 
 
 # Get list of all downloaded files
