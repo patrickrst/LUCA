@@ -1,8 +1,8 @@
 TODO
 ====
-* [ ] Filter user input
+* [ ] ~~Filter user input~~ (Not needed)
 * [-] Handle error
-* [ ] Remove illegal characters in downloaded creations
+* [x] Remove illegal characters in downloaded creations
 * [ ] Distinguish between images, videos and LDD files
 * [x] Work with username as an input (instead of memberid)
 * [ ] Add creation comments to the HTML file

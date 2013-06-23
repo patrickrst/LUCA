@@ -26,7 +26,7 @@ import requests
 from bs4 import BeautifulSoup
 
 app = "LUCA"
-majver = "0.3"
+majver = "0.4"
 minver = ""
 
 # Write window title
