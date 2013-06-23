@@ -164,7 +164,7 @@ for creation in creations:
     HTMLfilename = "{0}.html".format(titleT)
     for char in blacklist:  
         if char in HTMLfilename:
-            filename = HTMLfilename.replace(char, "-")
+            HTMLfilename = HTMLfilename.replace(char, "-")
 
     # Write HTML documents.        
     with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
