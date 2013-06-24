@@ -16,7 +16,7 @@ Prerequisites
 Author
 ------
 * Brickever
-* [Triangle717](https://github.com/le717]
+* [Triangle717](https://github.com/le717)
 
 
 License
