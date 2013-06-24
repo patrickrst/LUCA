@@ -35,7 +35,7 @@ build_exe_options = {"build_exe": destfolder}
 
 setup(
     name = "LUCA",
-    version = "0.3",
+    version = "0.4",
     author = "Brickever",
     description = "LEGO Universe Creation (Lab) Archiver",
     license = "GNU GPLv3",

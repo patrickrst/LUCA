@@ -16,14 +16,9 @@ Prerequisites
 Author
 ------
 * Brickever
-* Triangle717
+* [Triangle717](https://github.com/le717]
 
 
 License
 -------
-LUCA is released under the [GNU General Public License Version 3](https://gnu.org/licenses/gpl-3.0.txt). 
-
-
-
-
-
+LUCA is released under the [GNU General Public License Version 3](https://gnu.org/licenses/gpl-3.0.txt).

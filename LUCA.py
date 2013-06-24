@@ -21,7 +21,6 @@
 """
 import os
 import sys
-import time
 import requests
 from bs4 import BeautifulSoup
 
@@ -50,13 +49,15 @@ if not creations:
     raise SystemExit(0) 
         
 # Check if one link contains the localUserName
-# If not, close LUCA
 r = requests.get(creations[0]).content
 soup = BeautifulSoup(r)
 onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+# The username entered matched the one online,
+# begin downloading the creations
 if localUserName.lower() == onlineUserName.string.lower():
     memberid = onlineUserName.get('href')[63:99]
     print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
+# The name could not be found. Close LUCA.
 else:
     print('The username "{0}" does not appear to match with any usernames online.'.format(localUserName))
     input("Press Enter to close LUCA.")
@@ -81,10 +82,9 @@ for link in soup.find_all('a'):
     if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
         creations.append('http://universe.lego.com' + link.get('href'))
         
-
+        
+# ------- Information Gathering ------- #
 for creation in creations:
-
-# ------- INFORMATION GHATERING ------- #
     r = requests.get(creation).content
     soup = BeautifulSoup(r)
 
@@ -123,16 +123,17 @@ for creation in creations:
             imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/'+ imgLink.get('href'))
 
 
-# ------- INFORMATION WRITING ------- #
+# ------- Information Writing ------- #
     # List of illegal characters for filenames
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
-    # Makes it easier to understand what is going on.
+    # The folder to which the creations will be saved
     filepath = os.path.join(os.getcwd(), localUserName)
 
-
+    # Original filename  
     HTMLfilename = "{0}.html".format(titleString)
     for char in blacklist:  
         if char in HTMLfilename:
+            # If an illegal character is found, replace it with a dash
             HTMLfilename = HTMLfilename.replace(char, "-")
 
     # Write HTML documents.        
@@ -141,7 +142,7 @@ for creation in creations:
 
     # Display filename after it was installed, 
     # part of LUCA's non-GUI progress bar.
-    print(os.path.basename(HTMLfilename), end="\n")
+    print(HTMLfilename, end="\n")
     
     
     for imgLink in imgLinkList:
@@ -161,12 +162,12 @@ for creation in creations:
       
         # Display filename after it was installed, 
         # part of LUCA's non-GUI progress bar.
-        print(os.path.basename(filename), end="\n")
-        i = i + 1
-
+        print(filename, end="\n")
+        # Update number so creations are not overwritten
+        i +=1
 
 # Get list of all downloaded files
-num_of_files = os.listdir(os.path.join(os.getcwd(), localUserName))
+num_of_files = os.listdir(filepath)
 # Remove Thumbs.db from list
 if "Thumbs.db" in num_of_files:
     num_of_files.remove("Thumbs.db")

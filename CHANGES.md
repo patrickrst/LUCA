@@ -5,6 +5,12 @@ LUCA Changes
 ---
 *Released Unknown*
 
+* More script comments
+* Small variable updates
+* Write HTML document before everything else
+* Tidying up success message and remove import of `time` module
+* Tidying up on displaying of downloaded filename ("progress bar")
+
 0.3
 ---
 *Released June 23, 2013*
@@ -36,7 +42,7 @@ LUCA Changes
 * Updated "progress bar" to display filename as soon as it is downloaded, not after everything was downloaded
 * Added error handling when LUCA does not find any links when searching on the Creation Lab for an entered username
 * Updated: usernames are now case-insensitive.
-* Added filtering of Windows invalid characters in filename (code from le717 Issue #4)
+* Added filtering of Windows invalid characters in filename (code from Triangle717, [Issue #4](https://github.com/Brickever/LUCA/issues/4)
 
 0.2
 ---
