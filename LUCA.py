@@ -64,9 +64,6 @@ else:
     raise SystemExit(0)
 
 
-
-
-
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
@@ -78,19 +75,19 @@ if not os.path.exists(localUserName):
 
 
 creations = []
-for link in soup.find_all('a'): 
-    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
+for link in soup.find_all('a'):
+    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
         creations.append('http://universe.lego.com' + link.get('href'))
-        
-        
+
+
 # ------- Information Gathering ------- #
 for creation in creations:
     r = requests.get(creation).content
     soup = BeautifulSoup(r)
 
-    title = soup.find_all('h1')[2]   #add .string to get only the text
+    title = soup.find_all('h1')[2]   # add .string to get only the text
     titleString = title.string
-    titleString = titleString.replace('/','')
+    titleString = titleString.replace('/', '')
     description = soup.find(id="creationInfoText")
     tags = soup.find_all(class_='column-round-body')[3].contents[9]
     challenge = soup.find(id="CreationChallenge").contents[1].contents[1]
@@ -98,7 +95,7 @@ for creation in creations:
     date = soup.find(id="CreationUser")
     date.div.decompose()
     date.a.decompose()
-    
+
     page = '''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,54 +114,53 @@ for creation in creations:
 
     imgLinkList = []
     i = 1
-    
+
     for imgLink in soup.find_all('a'):
         if imgLink.get('href')[0:13] == "GetMedia.aspx":
             imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/'+ imgLink.get('href'))
 
-
 # ------- Information Writing ------- #
+
     # List of illegal characters for filenames
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
     # The folder to which the creations will be saved
     filepath = os.path.join(os.getcwd(), localUserName)
 
-    # Original filename  
+    # Original filename
     HTMLfilename = "{0}.html".format(titleString)
-    for char in blacklist:  
+    for char in blacklist:
         if char in HTMLfilename:
             # If an illegal character is found, replace it with a dash
             HTMLfilename = HTMLfilename.replace(char, "-")
 
-    # Write HTML documents.        
+    # Write HTML documents.
     with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
 
-    # Display filename after it was installed, 
+    # Display filename after it was installed,
     # part of LUCA's non-GUI progress bar.
     print(HTMLfilename, end="\n")
-    
-    
+
     for imgLink in imgLinkList:
         r = requests.get(imgLink)
-        img = r.content            
-       
-        # Original filename  
+        img = r.content
+
+        # Original filename
         filename = "{0}{1}.jpg".format(titleString, i)
-        for char in blacklist:  
+        for char in blacklist:
             if char in filename:
                 # If an illegal character is found, replace it with a dash
                 filename = filename.replace(char, "-")
 
-        # Write all non HTML files.  
+        # Write all non HTML files.
         with open(os.path.join(filepath, filename), 'wb') as newImg:
             newImg.write(img)
-      
-        # Display filename after it was installed, 
+
+        # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
         print(filename, end="\n")
         # Update number so creations are not overwritten
-        i +=1
+        i += 1
 
 # Get list of all downloaded files
 num_of_files = os.listdir(filepath)
@@ -177,12 +173,4 @@ if "Thumbs.db" in num_of_files:
 print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(len(num_of_files), filepath))
 input("\nPress Enter to close LUCA.\n")
 raise SystemExit(0)
-    
-
-
-
-
-
-
-
 
