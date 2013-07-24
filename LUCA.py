@@ -37,17 +37,17 @@ url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 creations = []
-for link in soup.find_all('a'): 
-    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx": 
+for link in soup.find_all('a'):
+    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
         creations.append('http://universe.lego.com' + link.get('href'))
 
 # Check if links were found/added for the entered username
-# If not, close LUCA 
+# If not, close LUCA
 if not creations:
     print('The username "{0}" does not result in any search entry on the Creation Lab.'.format(localUserName))
     input("Press Enter to close LUCA.")
-    raise SystemExit(0) 
-        
+    raise SystemExit(0)
+
 # Check if one link contains the localUserName
 r = requests.get(creations[0]).content
 soup = BeautifulSoup(r)
@@ -61,7 +61,7 @@ if localUserName.lower() == onlineUserName.string.lower():
 else:
     print('The username "{0}" does not appear to match with any usernames online.'.format(localUserName))
     input("Press Enter to close LUCA.")
-    raise SystemExit(0) 
+    raise SystemExit(0)
 
 
 
