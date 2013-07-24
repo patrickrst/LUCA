@@ -23,9 +23,8 @@
 # LUCA setup script using cx_Freeze.
 from cx_Freeze import setup, Executable
 import sys
-import os
 
-# Compile into the proper folder depending on the architecture
+# Freeze into the proper folder depending on the architecture
 if sys.maxsize == 2147483647:
     destfolder = "Builds/Windows32"
 else:
@@ -34,11 +33,11 @@ else:
 build_exe_options = {"build_exe": destfolder}
 
 setup(
-    name = "LUCA",
-    version = "0.4",
-    author = "Brickever",
-    description = "LEGO Universe Creation (Lab) Archiver",
-    license = "GNU GPLv3",
-    options = {"build_exe": build_exe_options},
-    executables = [Executable("LUCA.py", targetName="LUCA.exe")]
+    name="LUCA",
+    version="0.4",
+    author="Brickever",
+    description="LEGO Universe Creation (Lab) Archiver",
+    license="GNU GPLv3",
+    options={"build_exe": build_exe_options},
+    executables=[Executable("LUCA.py", targetName="LUCA.exe")]
 )
