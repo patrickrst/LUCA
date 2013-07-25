@@ -20,7 +20,6 @@
     along with LUCA If not, see <http://www.gnu.org/licenses/>.
 """
 import os
-import sys
 import requests
 from bs4 import BeautifulSoup
 
@@ -33,38 +32,47 @@ os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
 # Search the localUserName on the Creation Lab
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(localUserName)
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(
+    localUserName)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 creations = []
 for link in soup.find_all('a'):
     if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-        creations.append('http://universe.lego.com' + link.get('href'))
+        creations.append('http://universe.lego.com{0}'.format(link.get('href')))
 
 # Check if links were found/added for the entered username
 # If not, close LUCA
 if not creations:
-    print('The username "{0}" does not result in any search entry on the Creation Lab.'.format(localUserName))
-    input("Press Enter to close LUCA.")
+    print('The username "{0}" was not found on the Creation Lab.'.format(
+        localUserName))
+    input("\nPress Enter to close LUCA.")
     raise SystemExit(0)
 
 # Check if one link contains the localUserName
 r = requests.get(creations[0]).content
 soup = BeautifulSoup(r)
-onlineUserName = soup.find(id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+onlineUserName = soup.find(
+    id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+
 # The username entered matched the one online,
 # begin downloading the creations
 if localUserName.lower() == onlineUserName.string.lower():
     memberid = onlineUserName.get('href')[63:99]
     print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
-# The name could not be found. Close LUCA.
+
+# The name could not be found, close LUCA.
+# Possible TODO: This message is hard if impossible to trigger unless
+# .lower() is taken off localUserName above. It's possible this can be removed.
 else:
-    print('The username "{0}" does not appear to match with any usernames online.'.format(localUserName))
-    input("Press Enter to close LUCA.")
+    print('The username "{0}" does not appear to match with any usernames online.'
+    .format(localUserName))
+    input("\nPress Enter to close LUCA.")
     raise SystemExit(0)
 
 
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(
+    memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 
@@ -77,7 +85,7 @@ if not os.path.exists(localUserName):
 creations = []
 for link in soup.find_all('a'):
     if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-        creations.append('http://universe.lego.com' + link.get('href'))
+        creations.append('http://universe.lego.com{0}'.format(link.get('href')))
 
 
 # ------- Information Gathering ------- #
@@ -117,7 +125,8 @@ for creation in creations:
 
     for imgLink in soup.find_all('a'):
         if imgLink.get('href')[0:13] == "GetMedia.aspx":
-            imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/'+ imgLink.get('href'))
+            imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
+            .format(imgLink.get('href')))
 
 # ------- Information Writing ------- #
 
@@ -139,7 +148,7 @@ for creation in creations:
 
     # Display filename after it was installed,
     # part of LUCA's non-GUI progress bar.
-    print(HTMLfilename, end="\n")
+    print(HTMLfilename)
 
     for imgLink in imgLinkList:
         r = requests.get(imgLink)
@@ -158,7 +167,7 @@ for creation in creations:
 
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
-        print(filename, end="\n")
+        print(filename)
         # Update number so creations are not overwritten
         i += 1
 
@@ -170,7 +179,7 @@ if "Thumbs.db" in num_of_files:
 
 # Display success message containing number
 # of files downloaded and where they were saved.
-print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(len(num_of_files), filepath))
-input("\nPress Enter to close LUCA.\n")
+print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(
+    len(num_of_files), filepath))
+input("\nPress Enter to close LUCA.")
 raise SystemExit(0)
-
