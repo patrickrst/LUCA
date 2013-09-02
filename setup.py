@@ -21,7 +21,7 @@
 """
 
 # LUCA setup script using cx_Freeze.
-from cx_Freeze import setup, Executable
+from cx_Freeze import (setup, Executable)
 import sys
 
 # Freeze into the proper folder depending on the architecture
@@ -30,7 +30,12 @@ if sys.maxsize == 2147483647:
 else:
     destfolder = "Builds/Windows64"
 
-build_exe_options = {"build_exe": destfolder}
+build_exe_options = {"build_exe": destfolder,
+                    "include_files": [
+                    "LICENSE",
+                    "README.md",
+                    "CHANGES.md"]
+                    }
 
 setup(
     name="LUCA",

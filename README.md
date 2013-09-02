@@ -7,7 +7,7 @@ The **LEGO Universe Creation (Lab) Archiver** is a command-line tool to backup c
 
 Prerequisites
 -------------
-* Tested under Windows (Unknown if it will work on Linux or OS X)
+* Tested under Windows (Unknown if it will work on Linux or Mac OS X)
 * Python 3.3
 * [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/)
 * [Requests](http://docs.python-requests.org/en/latest/)

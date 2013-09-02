@@ -13,6 +13,7 @@ LUCA Changes
 * Cleaned up `LUCA.py` and '`setup.py` to better conform to PEP8 style guidelines
 * Updated a few messages
 * Small internal cleanup
+* Include `LICENCE`, `README.md` and `CHANGES.md` file in freeze
 
 0.3
 ---
