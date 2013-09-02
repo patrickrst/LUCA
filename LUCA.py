@@ -88,7 +88,7 @@ for link in soup.find_all('a'):
         creations.append('http://universe.lego.com{0}'.format(link.get('href')))
 
 
-# ------- Information Gathering ------- #
+# ------- INFORMATION GATHERING ------- #
 for creation in creations:
     r = requests.get(creation).content
     soup = BeautifulSoup(r)
@@ -128,10 +128,11 @@ for creation in creations:
             imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
             .format(imgLink.get('href')))
 
-# ------- Information Writing ------- #
+# ------- INFORMATION WRITING ------- #
 
     # List of illegal characters for filenames
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+
     # The folder to which the creations will be saved
     filepath = os.path.join(os.getcwd(), localUserName)
 
@@ -168,11 +169,13 @@ for creation in creations:
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
         print(filename)
-        # Update number so creations are not overwritten
+
+        # Update filename so creations are not overwritten
         i += 1
 
 # Get list of all downloaded files
 num_of_files = os.listdir(filepath)
+
 # Remove Thumbs.db from list
 if "Thumbs.db" in num_of_files:
     num_of_files.remove("Thumbs.db")
