@@ -17,7 +17,7 @@ Author
 ------
 * Brickever
 * [Triangle717](https://github.com/le717)
-
+* [@rioforce](https://github.com/rioforce)
 
 License
 -------

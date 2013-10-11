@@ -9,7 +9,7 @@ TODO
 * [x] Create stylesheet
 * [x] Add a progress bar
 
-###Legend
+### Legend ###
 * [ ] ---> Todo
 * [-] ---> Partially done
 * [x] ---> Done

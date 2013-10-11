@@ -1,7 +1,7 @@
 LUCA Changes
 ============
 
-0.4
+1.0
 ---
 _Released Unknown_
 
@@ -43,6 +43,8 @@ _Released Unknown_
 * Changed HTML writing process
 * Display downloaded images
 * Created HTML stylesheet
+* Show more Creations in search results
+* Improved chances of finding a username
 
 0.3
 ---

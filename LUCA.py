@@ -26,7 +26,7 @@ import requests
 from bs4 import BeautifulSoup
 
 app = "LUCA"
-majver = "0.4"
+majver = "1.0"
 minver = ""
 
 
@@ -73,11 +73,11 @@ def searchUser(username, take2=False):
     """Find a username on the Creation Lab"""
     # Backup search method for finding the username on the Creation Lab
     if take2:
-        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(
-            localUserName)
+        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48".format(
+        localUserName)
 
     # Search the username on the Creation Lab
-    url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}".format(
+    url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48".format(
         localUserName)
 
     r = requests.get(url).content
@@ -96,7 +96,15 @@ def searchUser(username, take2=False):
         raise SystemExit(0)
 
     # Check if one link contains the localUserName
-    r = requests.get(creations[0]).content
+    try:
+        r = requests.get(creations[1]).content
+
+    # Index 1 gives the best chance of finding the username,
+    # but index 0 is needed for those who uploaded very few Creations
+    except IndexError:
+        r = requests.get(creations[0]).content
+
+    # Get the username
     soup = BeautifulSoup(r)
     onlineUserName = soup.find(
         id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
@@ -105,22 +113,21 @@ def searchUser(username, take2=False):
     # begin downloading the creations
     if localUserName.lower() == onlineUserName.string.lower():
         memberid = onlineUserName.get('href')[63:99]
-        print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
+        print("\nYour Creations are now downloading, {0}.\n".format(
+              localUserName))
         return memberid
 
     elif localUserName.lower() != onlineUserName.string.lower():
         # Search again, using a different query
         if not take2:
             searchUser(username, take2=True)
-        # Do not check the Creation Lab again. We have already checked it.
-        pass
 
-    # The name could not be found, close LUCA.
-    else:
-        print('The username "{0}" does not appear to match with any usernames online.'
-              .format(localUserName))
-        input("\nPress Enter to close LUCA.")
-        raise SystemExit(0)
+        # The name could not be found, close LUCA.
+        else:
+            print('The username "{0}" does not appear to match with any usernames online.'
+                  .format(localUserName))
+            input("\nPress Enter to close LUCA.")
+            raise SystemExit(0)
 
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
