@@ -36,6 +36,8 @@ _Released Unknown_
 * Added MOV and AVI video file type detection
 * Do not display filename if `UnicodeEncodeError` is raised
 * Display images using relative paths
+* Prevent possible infinite loop when searching username on Creation Lab
+* Lots of cleanup to raw HTML from Creation Lab
 
 0.3
 ---

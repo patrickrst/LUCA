@@ -109,7 +109,12 @@ def searchUser(username, take2=False):
         return memberid
 
     elif localUserName.lower() != onlineUserName.string.lower():
-        searchUser(username, take2=True)
+        # Search again, using a different query
+        if not take2:
+            searchUser(username, take2=True)
+        # Do not check the Creation Lab again. We have already checked it.
+        pass
+
 
     # The name could not be found, close LUCA.
     else:
@@ -162,14 +167,20 @@ for creation in creations:
     # Create string versions of the text
     title_str = str(title)
     description_str = str(description)
+    date_str = str(date)
+    tags_str = str(tags)
 
-    # Update adnd fix original HTML errors
-    # WARNING: Do not change the tabbed strings to spaces
+    # Update and fix original HTML errors
     title_str = title_str.replace("<h1>", '<h1 class="center">')
     description_str = description_str.replace("</br></br></br></br></br></br>", "")
-    description_str = description_str.replace("									", "")
+    description_str = description_str.replace("\t\t\t\t\t\t\t\t\t", "")
     description_str = description_str.replace('''
-								''', "")
+\t\t\t\t\t\t\t\t''', "")
+    tags_str = tags_str.lstrip('''<p>
+</p>''')
+    date_str = date_str.replace("\t\t\t\t\t\t\t\t\t", "")
+    date_str = date_str.replace("<br/>", "")
+    date_str = date_str.replace("\t\t\t\t\t\t\t\t", "")
 
     # List of non-HTML files to download
     imgLinkList = []
@@ -322,7 +333,7 @@ Creation saved from
 </body>
 </html>
     '''.format(titleString, time.strftime("%c", time.gmtime()),
-               title_str, description_str, tags, challenge, date, creation,
+               title_str, description_str, tags_str, challenge, date_str, creation,
                img_display * img_num, ".center { text-align: center; }")
 
     # Original HTML filename
