@@ -21,6 +21,7 @@
 """
 import os
 import time
+import imghdr
 import requests
 from bs4 import BeautifulSoup
 
@@ -33,8 +34,9 @@ os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
 # Search the localUserName on the Creation Lab
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(
+url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}".format(
     localUserName)
+
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 creations = []
@@ -65,7 +67,7 @@ if localUserName.lower() == onlineUserName.string.lower():
 # The name could not be found, close LUCA.
 else:
     print('The username "{0}" does not appear to match with any usernames online.'
-    .format(localUserName))
+          .format(localUserName))
     input("\nPress Enter to close LUCA.")
     raise SystemExit(0)
 
@@ -79,7 +81,6 @@ soup = BeautifulSoup(r)
 # unless it already exists
 if not os.path.exists(localUserName):
     os.mkdir(localUserName)
-
 
 creations = []
 for link in soup.find_all('a'):
@@ -96,6 +97,7 @@ for creation in creations:
     title = soup.find_all('h1')[2]   # add .string to get only the text
     titleString = title.string
     titleString = titleString.replace('/', '')
+    titleString = titleString.strip()
     description = soup.find(id="creationInfoText")
     tags = soup.find_all(class_='column-round-body')[3].contents[9]
     challenge = soup.find(id="CreationChallenge").contents[1].contents[1]
@@ -124,7 +126,7 @@ for creation in creations:
     for imgLink in soup.find_all('a'):
         if imgLink.get('href')[0:13] == "GetMedia.aspx":
             imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
-            .format(imgLink.get('href')))
+                               .format(imgLink.get('href')))
 
     # ------- INFORMATION WRITING ------- #
 
@@ -147,7 +149,7 @@ for creation in creations:
         img = r.content
 
         # Original filename
-        filename = "{0}{1}.jpg".format(titleString, i)
+        filename = "{0}{1}".format(titleString, i)
         for char in blacklist:
             if char in filename:
                 # If an illegal character is found, replace it with a dash
@@ -157,11 +159,37 @@ for creation in creations:
         with open(os.path.join(subfilepath, filename), 'wb') as newImg:
             newImg.write(img)
 
+        if imghdr.what(os.path.join(subfilepath, filename)) == "gif":
+            new_filename = "{0}.gif".format(filename)
+            os.replace(os.path.join(subfilepath, filename),
+                       os.path.join(subfilepath, new_filename))
+
+        elif imghdr.what(os.path.join(subfilepath, filename)) == "jpeg":
+            new_filename = "{0}.jpg".format(filename)
+            os.replace(os.path.join(subfilepath, filename),
+                       os.path.join(subfilepath, new_filename))
+
+        else:
+            with open(os.path.join(subfilepath, filename), "rb") as f:
+                header = f.readline(5)
+
+            if header == b"0&\xb2u\x8e":
+                new_filename = "{0}.wmv".format(filename)
+                os.replace(os.path.join(subfilepath, filename),
+                           os.path.join(subfilepath, new_filename))
+
+            elif header[2] == b"PK":
+                new_filename = "{0}.lxf".format(filename)
+                os.replace(os.path.join(subfilepath, filename),
+                           os.path.join(subfilepath, new_filename))
+            else:
+                new_filename = filename
+
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
-        print(filename)
+        print(new_filename)
         i += 1
-        image_list.append(filename)
+        image_list.append(new_filename)
         img_num = i - 1
 
         # Original filename
@@ -238,8 +266,12 @@ for root, dirnames, filenames in os.walk(mainfilepath):
         num_of_files.append(myfiles)
 
 # Display success message containing number
-# of files downloaded and where they were saved.
-print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(
-    len(num_of_files), mainfilepath))
+# of files downloaded from number of Creations, and where they were saved.
+print('''
+{0} files from {1} Creations successfully downloaded and saved to
+"{2}"'''.format(
+    len(num_of_files),
+    len(os.listdir(mainfilepath)),
+    mainfilepath))
 input("\nPress Enter to close LUCA.")
 raise SystemExit(0)

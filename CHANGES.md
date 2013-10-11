@@ -24,6 +24,10 @@ LUCA Changes
 * Use `os.walk()` to get number of files downloaded
 * Download each Creation to it's own subfolder
 * Reworked process to get number of files downloaded
+* Improved method of detecting username
+* Fix bug with folders being created with spaces in them
+* Added GIF, JPG, WMV, and LXF file type detection
+* Tell how many Creations were downloaded
 
 0.3
 ---
