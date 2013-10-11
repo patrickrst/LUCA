@@ -131,8 +131,13 @@ for creation in creations:
     # List of illegal characters for filenames
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
 
-    # The folder to which the creations will be saved
-    filepath = os.path.join(os.getcwd(), localUserName)
+    # The folders to which the creations will be saved
+    mainfilepath = os.path.join(os.getcwd(), localUserName)
+    subfilepath = os.path.join(mainfilepath, titleString)
+
+    # If the folder for each Creation does not exist, create it
+    if not os.path.exists(subfilepath):
+        os.makedirs(subfilepath)
 
     # List of images in Creation
     image_list = []
@@ -149,7 +154,7 @@ for creation in creations:
                 filename = filename.replace(char, "-")
 
         # Write all non-HTML files.
-        with open(os.path.join(filepath, filename), 'wb') as newImg:
+        with open(os.path.join(subfilepath, filename), 'wb') as newImg:
             newImg.write(img)
 
         # Display filename after it was installed,
@@ -168,7 +173,7 @@ for creation in creations:
 
         # Code to display the images
         img_display = '<a href="file:///{0}"><img src="file:///{0}" width="300" /></a>'.format(
-            os.path.join(filepath, filename))
+            os.path.join(mainfilepath, filename))
 
     # HTML document structure
     page = '''<!-- Creation archive saved by LUCA on {1} UTC
@@ -201,7 +206,7 @@ Creation saved from
                img_display * img_num, ".center { text-align: center; }")
 
     # Write HTML documents.
-    with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
+    with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
 
     # Display filename after it was installed,
@@ -212,19 +217,29 @@ Creation saved from
 # ------- Final Actions ------- #
 
 # Get list of all downloaded files
-num_of_files = os.listdir(filepath)
+num_of_files = []
+for root, dirnames, filenames in os.walk(mainfilepath):
 
-# Remove Thumbs.db from list
-if "Thumbs.db" in num_of_files:
-    num_of_files.remove("Thumbs.db")
+    # Remove Thumbs.db from list
+    if "Thumbs.db" in filenames:
+        filenames.remove("Thumbs.db")
 
-# Remove ehthumbs.db from list
-if "ehthumbs.db" in num_of_files:
-    num_of_files.remove("ehthumbs.db")
+    # Remove ehthumbs.db from list
+    if "ehthumbs.db" in filenames:
+        filenames.remove("ehthumbs.db")
+
+    # Remove Desktop.ini from list
+    if "Desktop.ini" in filenames:
+        filenames.remove("Desktop.ini")
+
+    # How many files were downloaded?
+    for files in filenames:
+        myfiles = os.path.join(root, files)
+        num_of_files.append(myfiles)
 
 # Display success message containing number
 # of files downloaded and where they were saved.
 print('\n{0} files successfully downloaded and saved to \n"{1}"'.format(
-    len(num_of_files), filepath))
+    len(num_of_files), mainfilepath))
 input("\nPress Enter to close LUCA.")
 raise SystemExit(0)

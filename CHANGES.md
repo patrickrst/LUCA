@@ -19,7 +19,11 @@ LUCA Changes
 * Write HTML comment stating when and how Creation was archived
 * Express archive time in UTC timestamp
 * Fixed multiple errors in raw HTML
-* Add new headers
+* Add new HTML headers
+* Remove `Desktop.ini` from number of files downloaded
+* Use `os.walk()` to get number of files downloaded
+* Download each Creation to it's own subfolder
+* Reworked process to get number of files downloaded
 
 0.3
 ---
