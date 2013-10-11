@@ -1,11 +1,11 @@
 TODO
 ====
 * [ ] ~~Filter user input~~ (Not needed)
-* [-] Handle error
+* [-] Handle all errors
 * [x] Remove illegal characters in downloaded creations
-* [ ] Distinguish between images, videos and LDD files
+* [x] Distinguish between images, videos and LDD files
 * [x] Work with username as an input (instead of memberid)
-* [ ] Add creation comments to the HTML file
+* [ ] ~~Add creation comments to the HTML file~~ (Not possible)
 * [ ] Create stylesheet
 * [x] Add a progress bar
 

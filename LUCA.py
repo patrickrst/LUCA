@@ -33,7 +33,9 @@ minver = ""
 def charCheck(text):
     """Checks for illegal characters in text"""
     # List of all illegal characters
-    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "."]
+
+    found_chars = []
 
     # Get the length of the text, minus one for proper indexing
     len_of_text = len(text) - 1
@@ -54,14 +56,15 @@ def charCheck(text):
             # Change value of variable; kill the loop, as we only need
             # to find one illegal character to end the (ball) game.
             illa = True
-            break
+            found_chars.append(text[len_of_text])
+            len_of_text -= 1
 
     # An illegal character was found
     if illa:
 
         # Assign variable containing the illegal character
-        char = text[len_of_text]
-        return (True, char)
+        #char = text[len_of_text]
+        return (True, found_chars)
 
     # Return False only if no illegal character is found
     return (False, None)
@@ -189,12 +192,13 @@ for creation in creations:
     subfilepath = os.path.join(mainfilepath, titleString)
 
     # Check for illegal characters in the creation title
-    answer, char = charCheck(titleString)
+    answer, chars = charCheck(titleString)
 
     # If there were illegal chracters, replace them with a dash
     if answer:
-        new_titleString = titleString.replace(char, "-")
-        subfilepath = os.path.join(mainfilepath, new_titleString)
+        for item in chars:
+            new_titleString = titleString.replace(item, "-")
+            subfilepath = os.path.join(mainfilepath, new_titleString)
 
     # If the folder for each Creation does not exist, create it
     if not os.path.exists(subfilepath):
@@ -211,11 +215,12 @@ for creation in creations:
         filename = "{0}{1}".format(titleString, i)
 
         # Check for illegal characters in the filenames
-        reply, letter = charCheck(filename)
+        reply, letters = charCheck(filename)
 
         # If an illegal character is found, replace it with a dash
         if reply:
-            filename = filename.replace(letter, "-")
+            for item in letters:
+                filename = filename.replace(item, "-")
 
         # Write all non-HTML files.
         with open(os.path.join(subfilepath, filename), 'wb') as newImg:
@@ -238,8 +243,14 @@ for creation in creations:
             with open(os.path.join(subfilepath, filename), "rb") as f:
                 header = f.readline(5)
 
+            # This is an LDD LXF model <http://ldd.lego.com/>
+            if header[2] == b"PK":
+                new_filename = "{0}.lxf".format(filename)
+                os.replace(os.path.join(subfilepath, filename),
+                           os.path.join(subfilepath, new_filename))
+
             # This is an WMV video
-            if header == b"0&\xb2u\x8e":
+            elif header == b"0&\xb2u\x8e":
                 new_filename = "{0}.wmv".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
@@ -250,27 +261,43 @@ for creation in creations:
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
 
-            # This is an LDD LXF model <http://ldd.lego.com/>
-            elif header[2] == b"PK":
-                new_filename = "{0}.lxf".format(filename)
+            # This is an AVI video
+            # NOTE: This was found in an H.264 AVI file
+            elif header == b"\x00\x00\x00\x1cf":
+                new_filename = "{0}.mpg".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
+
+            # This is MOV video
             else:
-                new_filename = filename
+                new_filename = "{0}.mov".format(filename)
+                os.replace(os.path.join(subfilepath, filename),
+                           os.path.join(subfilepath, new_filename))
+
+            """
+            The AVI and MOV file type is a container, meaning different types
+            of codecs (what the real format is) can vary.
+            In this sense, AVI and MOV file detection is fuzzy.
+            """
 
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
         print(new_filename)
         i += 1
+
         image_list.append(new_filename)
         img_num = i - 1
 
-        # Original filename
+        # Original HTML filename
         HTMLfilename = "{0}.html".format(titleString)
-        for char in blacklist:
-            if char in HTMLfilename:
-                # If an illegal character is found, replace it with a dash
-                HTMLfilename = HTMLfilename.replace(char, "-")
+
+        # Check for illegal characters in the filenames
+        response, symbol = charCheck(HTMLfilename)
+
+        # If an illegal character is found, replace it with a dash
+        if response:
+            for piece in symbol:
+                HTMLfilename = HTMLfilename.replace(piece, "-")
 
         # Code to display the images
         img_display = '<a href="file:///{0}"><img src="file:///{0}" width="300" /></a>'.format(

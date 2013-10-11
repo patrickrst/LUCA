@@ -3,7 +3,7 @@ LUCA Changes
 
 0.4
 ---
-*Released Unknown*
+_Released Unknown_
 
 * More script comments
 * Small variable updates
@@ -31,10 +31,13 @@ LUCA Changes
 * Added MPG video file type detection
 * Completely rewrote the illegal chracter check
 * Improved method of detecting username (again)
+* Expanded rewritten illegal chracter check to HTML documents
+* Detect and replace all illegal characters
+* Added MOV and AVI video file type detection
 
 0.3
 ---
-*Released June 23, 2013*
+_Released June 23, 2013_
 
 * Small message formatting
 * Added missing `</head>` tag for HTML document
@@ -67,7 +70,7 @@ LUCA Changes
 
 0.2
 ---
-*Released May 29, 2013*
+_Released May 29, 2013_
 
 * Added invalid website check
 * Updated user input to ask for Creation Lab `username` only, rather than `memberid` and `username`
@@ -78,4 +81,4 @@ LUCA Changes
 
 0.1
 ---
-*Released Never*
+_Released Never_
