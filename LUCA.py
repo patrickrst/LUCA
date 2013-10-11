@@ -29,48 +29,99 @@ app = "LUCA"
 majver = "0.4"
 minver = ""
 
+
+def charCheck(text):
+    """Checks for illegal characters in text"""
+    # List of all illegal characters
+    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+
+    # Get the length of the text, minus one for proper indexing
+    len_of_text = len(text) - 1
+
+    # Assign variable containing result of check; default to False
+    illa = False
+
+    # -1 so the first character is caught too
+    while len_of_text != -1:
+
+        # This character is allowed
+        if text[len_of_text] not in illegal_chars:
+            # The check goes in reverse, checking the last character first.
+            len_of_text -= 1
+
+        # This character is not allowed
+        elif text[len_of_text] in illegal_chars:
+            # Change value of variable; kill the loop, as we only need
+            # to find one illegal character to end the (ball) game.
+            illa = True
+            break
+
+    # An illegal character was found
+    if illa:
+
+        # Assign variable containing the illegal character
+        char = text[len_of_text]
+        return (True, char)
+
+    # Return False only if no illegal character is found
+    return (False, None)
+
+
+def searchUser(username, take2=False):
+    """Find a username on the Creation Lab"""
+    # Backup search method for finding the username on the Creation Lab
+    if take2:
+        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=12".format(
+            localUserName)
+
+    # Search the username on the Creation Lab
+    url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}".format(
+        localUserName)
+
+    r = requests.get(url).content
+    soup = BeautifulSoup(r)
+    creations = []
+    for link in soup.find_all('a'):
+        if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+            creations.append('http://universe.lego.com{0}'.format(link.get('href')))
+
+    # Check if links were found/added for the entered username
+    # If not, close LUCA
+    if not creations:
+        print('The username "{0}" was not found on the Creation Lab.'.format(
+            localUserName))
+        input("\nPress Enter to close LUCA.")
+        raise SystemExit(0)
+
+    # Check if one link contains the localUserName
+    r = requests.get(creations[0]).content
+    soup = BeautifulSoup(r)
+    onlineUserName = soup.find(
+        id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+
+    # The username entered matched the one online,
+    # begin downloading the creations
+    if localUserName.lower() == onlineUserName.string.lower():
+        memberid = onlineUserName.get('href')[63:99]
+        print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
+        return memberid
+
+    elif localUserName.lower() != onlineUserName.string.lower():
+        searchUser(username, take2=True)
+
+    # The name could not be found, close LUCA.
+    else:
+        print('The username "{0}" does not appear to match with any usernames online.'
+              .format(localUserName))
+        input("\nPress Enter to close LUCA.")
+        raise SystemExit(0)
+
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
-# Search the localUserName on the Creation Lab
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}".format(
-    localUserName)
-
-r = requests.get(url).content
-soup = BeautifulSoup(r)
-creations = []
-for link in soup.find_all('a'):
-    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-        creations.append('http://universe.lego.com{0}'.format(link.get('href')))
-
-# Check if links were found/added for the entered username
-# If not, close LUCA
-if not creations:
-    print('The username "{0}" was not found on the Creation Lab.'.format(
-        localUserName))
-    input("\nPress Enter to close LUCA.")
-    raise SystemExit(0)
-
-# Check if one link contains the localUserName
-r = requests.get(creations[0]).content
-soup = BeautifulSoup(r)
-onlineUserName = soup.find(
-    id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
-
-# The username entered matched the one online,
-# begin downloading the creations
-if localUserName.lower() == onlineUserName.string.lower():
-    memberid = onlineUserName.get('href')[63:99]
-    print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
-
-# The name could not be found, close LUCA.
-else:
-    print('The username "{0}" does not appear to match with any usernames online.'
-          .format(localUserName))
-    input("\nPress Enter to close LUCA.")
-    raise SystemExit(0)
-
+# Search for the username on the Creation Lab
+memberid = searchUser(localUserName, take2=False)
 
 url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(
     memberid)
@@ -88,7 +139,7 @@ for link in soup.find_all('a'):
         creations.append('http://universe.lego.com{0}'.format(link.get('href')))
 
 
-# ------- INFORMATION GATHERING ------- #
+# ------- Information Gathering ------- #
 
 for creation in creations:
     r = requests.get(creation).content
@@ -128,7 +179,7 @@ for creation in creations:
             imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
                                .format(imgLink.get('href')))
 
-    # ------- INFORMATION WRITING ------- #
+    # ------- Information Writing ------- #
 
     # List of illegal characters for filenames
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
@@ -136,6 +187,14 @@ for creation in creations:
     # The folders to which the creations will be saved
     mainfilepath = os.path.join(os.getcwd(), localUserName)
     subfilepath = os.path.join(mainfilepath, titleString)
+
+    # Check for illegal characters in the creation title
+    answer, char = charCheck(titleString)
+
+    # If there were illegal chracters, replace them with a dash
+    if answer:
+        new_titleString = titleString.replace(char, "-")
+        subfilepath = os.path.join(mainfilepath, new_titleString)
 
     # If the folder for each Creation does not exist, create it
     if not os.path.exists(subfilepath):
@@ -150,34 +209,48 @@ for creation in creations:
 
         # Original filename
         filename = "{0}{1}".format(titleString, i)
-        for char in blacklist:
-            if char in filename:
-                # If an illegal character is found, replace it with a dash
-                filename = filename.replace(char, "-")
+
+        # Check for illegal characters in the filenames
+        reply, letter = charCheck(filename)
+
+        # If an illegal character is found, replace it with a dash
+        if reply:
+            filename = filename.replace(letter, "-")
 
         # Write all non-HTML files.
         with open(os.path.join(subfilepath, filename), 'wb') as newImg:
             newImg.write(img)
 
+        #  This is an GIF image
         if imghdr.what(os.path.join(subfilepath, filename)) == "gif":
             new_filename = "{0}.gif".format(filename)
             os.replace(os.path.join(subfilepath, filename),
                        os.path.join(subfilepath, new_filename))
 
+        # This is an JPG image
         elif imghdr.what(os.path.join(subfilepath, filename)) == "jpeg":
             new_filename = "{0}.jpg".format(filename)
             os.replace(os.path.join(subfilepath, filename),
                        os.path.join(subfilepath, new_filename))
 
         else:
+            # Read the first 5 bytes of the file
             with open(os.path.join(subfilepath, filename), "rb") as f:
                 header = f.readline(5)
 
+            # This is an WMV video
             if header == b"0&\xb2u\x8e":
                 new_filename = "{0}.wmv".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
 
+            # This is an MPG video
+            elif header == b"\x00\x00\x01\xba!":
+                new_filename = "{0}.mpg".format(filename)
+                os.replace(os.path.join(subfilepath, filename),
+                           os.path.join(subfilepath, new_filename))
+
+            # This is an LDD LXF model <http://ldd.lego.com/>
             elif header[2] == b"PK":
                 new_filename = "{0}.lxf".format(filename)
                 os.replace(os.path.join(subfilepath, filename),

@@ -28,6 +28,9 @@ LUCA Changes
 * Fix bug with folders being created with spaces in them
 * Added GIF, JPG, WMV, and LXF file type detection
 * Tell how many Creations were downloaded
+* Added MPG video file type detection
+* Completely rewrote the illegal chracter check
+* Improved method of detecting username (again)
 
 0.3
 ---
