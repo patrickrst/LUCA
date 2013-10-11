@@ -88,6 +88,7 @@ for link in soup.find_all('a'):
 
 
 # ------- INFORMATION GATHERING ------- #
+
 for creation in creations:
     r = requests.get(creation).content
     soup = BeautifulSoup(r)
@@ -103,7 +104,45 @@ for creation in creations:
     date.div.decompose()
     date.a.decompose()
 
-    # HTML document structure
+    # List of non-HTML files to download
+    imgLinkList = []
+    i = 1
+
+    # Populate the list
+    for imgLink in soup.find_all('a'):
+        if imgLink.get('href')[0:13] == "GetMedia.aspx":
+            imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
+            .format(imgLink.get('href')))
+
+    # ------- INFORMATION WRITING ------- #
+
+    # List of illegal characters for filenames
+    blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+
+    # The folder to which the creations will be saved
+    filepath = os.path.join(os.getcwd(), localUserName)
+
+    for imgLink in imgLinkList:
+        r = requests.get(imgLink)
+        img = r.content
+
+        # Original filename
+        filename = "{0}{1}.jpg".format(titleString, i)
+        for char in blacklist:
+            if char in filename:
+                # If an illegal character is found, replace it with a dash
+                filename = filename.replace(char, "-")
+
+        # Write all non-HTML files.
+        with open(os.path.join(filepath, filename), 'wb') as newImg:
+            newImg.write(img)
+
+        # Display filename after it was installed,
+        # part of LUCA's non-GUI progress bar.
+        print(filename)
+        i += 1
+
+        # HTML document structure
     page = '''<!-- Creation archive saved by LUCA on {1}
 https://github.com/Brickever/LUCA#readme -->
 
@@ -126,22 +165,6 @@ Creation saved from
     '''.format(titleString, time.strftime("%c", time.localtime()),
                title, description, tags, challenge, date, creation)
 
-    imgLinkList = []
-    i = 1
-
-    for imgLink in soup.find_all('a'):
-        if imgLink.get('href')[0:13] == "GetMedia.aspx":
-            imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
-            .format(imgLink.get('href')))
-
-# ------- INFORMATION WRITING ------- #
-
-    # List of illegal characters for filenames
-    blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
-
-    # The folder to which the creations will be saved
-    filepath = os.path.join(os.getcwd(), localUserName)
-
     # Original filename
     HTMLfilename = "{0}.html".format(titleString)
     for char in blacklist:
@@ -157,25 +180,8 @@ Creation saved from
     # part of LUCA's non-GUI progress bar.
     print(HTMLfilename)
 
-    for imgLink in imgLinkList:
-        r = requests.get(imgLink)
-        img = r.content
 
-        # Original filename
-        filename = "{0}{1}.jpg".format(titleString, i)
-        for char in blacklist:
-            if char in filename:
-                # If an illegal character is found, replace it with a dash
-                filename = filename.replace(char, "-")
-
-        # Write all non HTML files.
-        with open(os.path.join(filepath, filename), 'wb') as newImg:
-            newImg.write(img)
-
-        # Display filename after it was installed,
-        # part of LUCA's non-GUI progress bar.
-        print(filename)
-        i += 1
+# ------- Final Actions ------- #
 
 # Get list of all downloaded files
 num_of_files = os.listdir(filepath)

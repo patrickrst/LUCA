@@ -8,7 +8,7 @@ LUCA Changes
 * More script comments
 * Small variable updates
 * Write HTML document before everything else
-* Tidying up success message and remove import of `time` module
+* Tidying up success message
 * Tidying up on displaying of downloaded filename ("progress bar")
 * Cleaned up `LUCA.py` and `setup.py` to better conform to PEP8 style guidelines
 * Updated a few messages
