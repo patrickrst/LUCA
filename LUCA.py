@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+# -*- coding: utf-8 -*-
 """
     This file is part of LUCA.
 
@@ -20,6 +20,7 @@
     along with LUCA If not, see <http://www.gnu.org/licenses/>.
 """
 import os
+import time
 import requests
 from bs4 import BeautifulSoup
 
@@ -62,8 +63,6 @@ if localUserName.lower() == onlineUserName.string.lower():
     print("\nYour Creations are now downloading, {0}.\n".format(localUserName))
 
 # The name could not be found, close LUCA.
-# Possible TODO: This message is hard if impossible to trigger unless
-# .lower() is taken off localUserName above. It's possible this can be removed.
 else:
     print('The username "{0}" does not appear to match with any usernames online.'
     .format(localUserName))
@@ -104,21 +103,28 @@ for creation in creations:
     date.div.decompose()
     date.a.decompose()
 
-    page = '''<!DOCTYPE html>
+    # HTML document structure
+    page = '''<!-- Creation archive saved by LUCA on {1}
+https://github.com/Brickever/LUCA#readme -->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <title>{0}</title>
 </head>
 <body>
-{1}
 {2}
 {3}
 {4}
-{5}
+Challenge: {5}{6}
+Creation saved from
+<br>
+<a href="{7}" target="_blank">{7}</a>
 </body>
 </html>
-    '''.format(titleString, title, description, tags, challenge, date)
+    '''.format(titleString, time.strftime("%c", time.localtime()),
+               title, description, tags, challenge, date, creation)
 
     imgLinkList = []
     i = 1
@@ -169,8 +175,6 @@ for creation in creations:
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
         print(filename)
-
-        # Update filename so creations are not overwritten
         i += 1
 
 # Get list of all downloaded files
@@ -179,6 +183,10 @@ num_of_files = os.listdir(filepath)
 # Remove Thumbs.db from list
 if "Thumbs.db" in num_of_files:
     num_of_files.remove("Thumbs.db")
+
+# Remove ehthumbs.db from list
+if "ehthumbs.db" in num_of_files:
+    num_of_files.remove("ehthumbs.db")
 
 # Display success message containing number
 # of files downloaded and where they were saved.
