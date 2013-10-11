@@ -35,6 +35,7 @@ _Released Unknown_
 * Detect and replace all illegal characters
 * Added MOV and AVI video file type detection
 * Do not display filename if `UnicodeEncodeError` is raised
+* Display images using relative paths
 
 0.3
 ---

@@ -293,8 +293,7 @@ for creation in creations:
         img_num = i - 1
 
         # Code to display the images
-        img_display = '<a href="file:///{0}"><img src="file:///{0}" width="300" /></a>'.format(
-            os.path.join(mainfilepath, filename))
+        img_display = '<a href="{0}"><img src="{0}" width="300" /></a>'.format(filename)
 
     # HTML document structure
     page = '''<!-- Creation archive saved by LUCA on {1} UTC
