@@ -170,7 +170,6 @@ for creation in creations:
     tags_str = str(tags)
 
     # Update and fix original HTML errors
-    title_str = title_str.replace("<h1>", '<h1 class="center">')
     title_str = title_str.replace("</h1>", "")
     title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h2>'.format(
         title_str, "http://mln.lego.com/en-us/PublicView/", localUserName)
@@ -321,20 +320,27 @@ https://github.com/Brickever/LUCA#readme -->
 <style>
 {2}
 {3}
+{4}
+{5}
 </style>
 </head>
 <body>
-{4}
-<h2 class="center">Challenge</h2>
-{6} Submitted {7}
-
-<h2 class="center">Description</h2>
+{6}
+<div class="line-separator"></div>
+<h2>Challenge</h2>
 {8}
-<h2 class="center">Images</h2>
-<div id="pictures" class="center">'''.format(
+<br>Submitted {9}
+
+<div class="line-separator"></div>
+<h2>Description</h2>
+{10}
+<h2>Images</h2>
+<div id="pictures">'''.format(
         time.strftime("%c", time.gmtime()), titleString,
-        ".center { text-align: center; }",
-        "#pictures { box-shadow: 5px 5px 5px; }",
+        "body { background-color: #212121; color: white; text-align: center;}",
+        "h1, h2 {font-family: sans-serif; }",
+        ".line-separator{ height:1px; background:#717171; border-bottom:1px solid #313030; }",
+        "a { color: #A9A9A9; text-decoration: none;}",
         title_str, localUserName, challenge, date_str, description_str)
 
     # Original HTML filename
@@ -370,12 +376,14 @@ https://github.com/Brickever/LUCA#readme -->
         finishHTML.write('''
 </div>
 <br>
-Creation saved from
+<div class="line-separator"></div>
+<br>
+Original Creation Link:
 <br>
 <a href="{0}" target="_blank">{0}</a>
 <br>
 <br>
-Tagged under {1}
+Tags {1}
 </body>
 </html>
 '''.format(creation, tags_str))

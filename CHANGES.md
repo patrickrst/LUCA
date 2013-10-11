@@ -42,6 +42,7 @@ _Released Unknown_
 * Rearrange entire HTML document
 * Changed HTML writing process
 * Display downloaded images
+* Created HTML stylesheet
 
 0.3
 ---

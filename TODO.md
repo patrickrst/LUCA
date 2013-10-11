@@ -6,7 +6,7 @@ TODO
 * [x] Distinguish between images, videos and LDD files
 * [x] Work with username as an input (instead of memberid)
 * [ ] ~~Add creation comments to the HTML file~~ (Not possible)
-* [ ] Create stylesheet
+* [x] Create stylesheet
 * [x] Add a progress bar
 
 ###Legend
