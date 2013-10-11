@@ -10,13 +10,16 @@ LUCA Changes
 * Write HTML document before everything else
 * Tidying up success message
 * Tidying up on displaying of downloaded filename ("progress bar")
-* Cleaned up `LUCA.py` and `setup.py` to better conform to PEP8 style guidelines
+* Cleaned up `LUCA.py` and `setup.py` to better conform to PEP 8 style guidelines
 * Updated a few messages
 * Small internal cleanup
 * Include `LICENCE`, `README.md` and `CHANGES.md` file in freeze
 * Remove `ehthumbs.db` from number of files downloaded
 * Display link in HTML from where Creation was downloaded from
 * Write HTML comment stating when and how Creation was archived
+* Express archive time in UTC timestamp
+* Fixed multiple errors in raw HTML
+* Add new headers
 
 0.3
 ---

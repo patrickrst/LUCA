@@ -104,6 +104,18 @@ for creation in creations:
     date.div.decompose()
     date.a.decompose()
 
+    # Create string versions of the text
+    title_str = str(title)
+    description_str = str(description)
+
+    # Update adnd fix original HTML errors
+    # WARNING: Do not change the tabbed strings to spaces
+    title_str = title_str.replace("<h1>", '<h1 class="center">')
+    description_str = description_str.replace("</br></br></br></br></br></br>", "")
+    description_str = description_str.replace("									", "")
+    description_str = description_str.replace('''
+								''', "")
+
     # List of non-HTML files to download
     imgLinkList = []
     i = 1
@@ -121,6 +133,9 @@ for creation in creations:
 
     # The folder to which the creations will be saved
     filepath = os.path.join(os.getcwd(), localUserName)
+
+    # List of images in Creation
+    image_list = []
 
     for imgLink in imgLinkList:
         r = requests.get(imgLink)
@@ -141,9 +156,22 @@ for creation in creations:
         # part of LUCA's non-GUI progress bar.
         print(filename)
         i += 1
+        image_list.append(filename)
+        img_num = i - 1
 
-        # HTML document structure
-    page = '''<!-- Creation archive saved by LUCA on {1}
+        # Original filename
+        HTMLfilename = "{0}.html".format(titleString)
+        for char in blacklist:
+            if char in HTMLfilename:
+                # If an illegal character is found, replace it with a dash
+                HTMLfilename = HTMLfilename.replace(char, "-")
+
+        # Code to display the images
+        img_display = '<a href="file:///{0}"><img src="file:///{0}" width="300" /></a>'.format(
+            os.path.join(filepath, filename))
+
+    # HTML document structure
+    page = '''<!-- Creation archive saved by LUCA on {1} UTC
 https://github.com/Brickever/LUCA#readme -->
 
 <!DOCTYPE html>
@@ -151,26 +179,26 @@ https://github.com/Brickever/LUCA#readme -->
 <head>
 <meta charset="utf-8" />
 <title>{0}</title>
+<style>
+{9}
+</style>
 </head>
 <body>
 {2}
 {3}
 {4}
-Challenge: {5}{6}
+<h1 class="center">Images</h1>
+<p class="center">{8}</p>
+<h1 class="center">Challenge</h1>
+{5}{6}
 Creation saved from
 <br>
 <a href="{7}" target="_blank">{7}</a>
 </body>
 </html>
-    '''.format(titleString, time.strftime("%c", time.localtime()),
-               title, description, tags, challenge, date, creation)
-
-    # Original filename
-    HTMLfilename = "{0}.html".format(titleString)
-    for char in blacklist:
-        if char in HTMLfilename:
-            # If an illegal character is found, replace it with a dash
-            HTMLfilename = HTMLfilename.replace(char, "-")
+    '''.format(titleString, time.strftime("%c", time.gmtime()),
+               title_str, description_str, tags, challenge, date, creation,
+               img_display * img_num, ".center { text-align: center; }")
 
     # Write HTML documents.
     with open(os.path.join(filepath, HTMLfilename), "wt") as newHTML:
