@@ -38,6 +38,10 @@ _Released Unknown_
 * Display images using relative paths
 * Prevent possible infinite loop when searching username on Creation Lab
 * Lots of cleanup to raw HTML from Creation Lab
+* Tell who created the Creation, link username to MLN page
+* Rearrange entire HTML document
+* Changed HTML writing process
+* Display downloaded images
 
 0.3
 ---

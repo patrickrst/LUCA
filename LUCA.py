@@ -115,7 +115,6 @@ def searchUser(username, take2=False):
         # Do not check the Creation Lab again. We have already checked it.
         pass
 
-
     # The name could not be found, close LUCA.
     else:
         print('The username "{0}" does not appear to match with any usernames online.'
@@ -172,6 +171,9 @@ for creation in creations:
 
     # Update and fix original HTML errors
     title_str = title_str.replace("<h1>", '<h1 class="center">')
+    title_str = title_str.replace("</h1>", "")
+    title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h2>'.format(
+        title_str, "http://mln.lego.com/en-us/PublicView/", localUserName)
     description_str = description_str.replace("</br></br></br></br></br></br>", "")
     description_str = description_str.replace("\t\t\t\t\t\t\t\t\t", "")
     description_str = description_str.replace('''
@@ -181,6 +183,10 @@ for creation in creations:
     date_str = date_str.replace("\t\t\t\t\t\t\t\t\t", "")
     date_str = date_str.replace("<br/>", "")
     date_str = date_str.replace("\t\t\t\t\t\t\t\t", "")
+    date_str = date_str.replace('''<div class="column-round-body" id="CreationUser">
+<p>''', "")
+    date_str = date_str.replace('''
+''', "")
 
     # List of non-HTML files to download
     imgLinkList = []
@@ -301,40 +307,35 @@ for creation in creations:
         i += 1
 
         image_list.append(new_filename)
-        img_num = i - 1
-
-        # Code to display the images
-        img_display = '<a href="{0}"><img src="{0}" width="300" /></a>'.format(filename)
+        img_num = len(image_list) - 1
 
     # HTML document structure
-    page = '''<!-- Creation archive saved by LUCA on {1} UTC
+    page = '''<!-- Creation archive saved by LUCA on {0} UTC
 https://github.com/Brickever/LUCA#readme -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>{0}</title>
+<title>{1}</title>
 <style>
-{9}
+{2}
+{3}
 </style>
 </head>
 <body>
-{2}
-{3}
 {4}
-<h1 class="center">Images</h1>
-<p class="center">{8}</p>
-<h1 class="center">Challenge</h1>
-{5}{6}
-Creation saved from
-<br>
-<a href="{7}" target="_blank">{7}</a>
-</body>
-</html>
-    '''.format(titleString, time.strftime("%c", time.gmtime()),
-               title_str, description_str, tags_str, challenge, date_str, creation,
-               img_display * img_num, ".center { text-align: center; }")
+<h2 class="center">Challenge</h2>
+{6} Submitted {7}
+
+<h2 class="center">Description</h2>
+{8}
+<h2 class="center">Images</h2>
+<div id="pictures" class="center">'''.format(
+        time.strftime("%c", time.gmtime()), titleString,
+        ".center { text-align: center; }",
+        "#pictures { box-shadow: 5px 5px 5px; }",
+        title_str, localUserName, challenge, date_str, description_str)
 
     # Original HTML filename
     HTMLfilename = "{0}.html".format(titleString)
@@ -347,9 +348,37 @@ Creation saved from
         for piece in symbol:
             HTMLfilename = HTMLfilename.replace(piece, "-")
 
-    # Write HTML documents.
+    # Write initial HTML document structure
     with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
+
+    while img_num > -1:
+
+        # Code to display every image
+        img_display = '''
+<a title="Click for larger image" href="{0}"><img src="{0}" width="300" /></a>'''.format(
+            image_list[img_num])
+
+        # Write the HTML for the images
+        with open(os.path.join(subfilepath, HTMLfilename), "at") as updateHTML:
+            updateHTML.write("{0}".format(img_display))
+        # Display each image once
+        img_num -= 1
+
+    # Write the final HTML code
+    with open(os.path.join(subfilepath, HTMLfilename), "at") as finishHTML:
+        finishHTML.write('''
+</div>
+<br>
+Creation saved from
+<br>
+<a href="{0}" target="_blank">{0}</a>
+<br>
+<br>
+Tagged under {1}
+</body>
+</html>
+'''.format(creation, tags_str))
 
     # Display filename after it was installed,
     # part of LUCA's non-GUI progress bar.
