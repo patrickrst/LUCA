@@ -34,6 +34,7 @@ _Released Unknown_
 * Expanded rewritten illegal chracter check to HTML documents
 * Detect and replace all illegal characters
 * Added MOV and AVI video file type detection
+* Do not display filename if `UnicodeEncodeError` is raised
 
 0.3
 ---

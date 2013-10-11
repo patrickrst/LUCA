@@ -33,7 +33,7 @@ minver = ""
 def charCheck(text):
     """Checks for illegal characters in text"""
     # List of all illegal characters
-    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "."]
+    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
 
     found_chars = []
 
@@ -63,7 +63,6 @@ def charCheck(text):
     if illa:
 
         # Assign variable containing the illegal character
-        #char = text[len_of_text]
         return (True, found_chars)
 
     # Return False only if no illegal character is found
@@ -244,7 +243,7 @@ for creation in creations:
                 header = f.readline(5)
 
             # This is an LDD LXF model <http://ldd.lego.com/>
-            if header[2] == b"PK":
+            if header == b"PK\x03\x04\x14":
                 new_filename = "{0}.lxf".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
@@ -282,22 +281,16 @@ for creation in creations:
 
         # Display filename after it was installed,
         # part of LUCA's non-GUI progress bar.
-        print(new_filename)
+        try:
+            print(new_filename)
+        # If for some VERY strange reason if the filename cannot be displayed
+        except UnicodeEncodeError:
+            print("Filename display error. Creation saved!")
+            pass
         i += 1
 
         image_list.append(new_filename)
         img_num = i - 1
-
-        # Original HTML filename
-        HTMLfilename = "{0}.html".format(titleString)
-
-        # Check for illegal characters in the filenames
-        response, symbol = charCheck(HTMLfilename)
-
-        # If an illegal character is found, replace it with a dash
-        if response:
-            for piece in symbol:
-                HTMLfilename = HTMLfilename.replace(piece, "-")
 
         # Code to display the images
         img_display = '<a href="file:///{0}"><img src="file:///{0}" width="300" /></a>'.format(
@@ -333,13 +326,29 @@ Creation saved from
                title_str, description_str, tags, challenge, date, creation,
                img_display * img_num, ".center { text-align: center; }")
 
+    # Original HTML filename
+    HTMLfilename = "{0}.html".format(titleString)
+
+    # Check for illegal characters in the filenames
+    response, symbol = charCheck(HTMLfilename)
+
+    # If an illegal character is found, replace it with a dash
+    if response:
+        for piece in symbol:
+            HTMLfilename = HTMLfilename.replace(piece, "-")
+
     # Write HTML documents.
     with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
 
     # Display filename after it was installed,
     # part of LUCA's non-GUI progress bar.
-    print(HTMLfilename)
+    try:
+        print(HTMLfilename)
+    # If for some VERY strange reason if the filename cannot be displayed
+    except UnicodeEncodeError:
+        print("Filename display error. Creation saved!")
+        pass
 
 
 # ------- Final Actions ------- #
