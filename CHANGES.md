@@ -51,6 +51,7 @@ _Released Unknown_
 * Removed redundant Creation download code
 * Download all Creations by a user (fixes multiple pages bug)
 * Added app icon (`LUCAIcon.ico`)
+* Rename `LICENSE` to `LICENSE.txt`
 
 0.3
 ---

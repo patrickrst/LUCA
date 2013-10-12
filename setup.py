@@ -33,7 +33,7 @@ else:
 build_exe_options = {"build_exe": destfolder,
                     "icon": "LUCAIcon.ico",
                     "include_files": [
-                    "LICENSE",
+                    "LICENSE.txt",
                     "README.md",
                     "CHANGES.md"]
                     }
