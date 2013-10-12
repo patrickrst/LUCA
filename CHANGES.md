@@ -54,6 +54,10 @@ _Released Unknown_
 * Fixed display of tags
 * Various HTML fixes
 * PEP 8 checks
+* Remove debug prints
+* Wrap all code in functions
+* Adapt Date field for Creations from LEGO Universe competitions
+* Added script dividers
 
 0.3
 ---
