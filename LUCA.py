@@ -119,28 +119,29 @@ Rating''', "")
     # Convert the number to an integer
     num_of_pages = int(num_of_pages)
 
-    # List of Creations
+    # Holding pen for  possible Creations by the user
     creations = []
-    # Add the creations from page 1 to the list
+
+    # Gather the creations from the page
     for link in soup.find_all('a'):
         if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
             creations.append('http://universe.lego.com{0}'.format(
                 link.get('href')))
 
-    # If there is more than one page of Creations,
-    # add the creations from the other pages to the list
-    if num_of_pages > 1:
-        new_url = url[:-1]
-        while num_of_pages != 0:
-            url = "{0}{1}".format(new_url, num_of_pages)
-            num_of_pages -= 1
+    ## If there is more than one page of Creations,
+    ## add the creations from the other pages to the list
+    #if num_of_pages > 1:
+        #new_url = user_url[:-1]
+        #while num_of_pages != 0:
+            #page_url = "{0}{1}".format(new_url, num_of_pages)
+            #num_of_pages -= 1
 
-            req = requests.get(url).content
-            soup = BeautifulSoup(req)
-            for link in soup.find_all('a'):
-                if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-                    creations.append('http://universe.lego.com{0}'.format(
-                        link.get('href')))
+            #req = requests.get(page_url).content
+            #soup = BeautifulSoup(req)
+            #for page_link in soup.find_all('a'):
+                #if page_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+                    #creations.append('http://universe.lego.com{0}'.format(
+                        #page_link.get('href')))
 
     # Check if links were found/added for the entered username
     # If not, close LUCA
@@ -170,37 +171,43 @@ Rating''', "")
         soup1 = BeautifulSoup(r1)
         onlineUserName = soup1.find(
             id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+        print(onlineUserName.string)
 
     # Get the username from index 0
     soupzero = BeautifulSoup(rzero)
     onlineUserNamezero = soupzero.find(
         id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+    print(onlineUserNamezero.string)
 
     # This is not the second search
     if not take2:
         # There are two possible names to check
         if r1 is None:
-            checkUser(localUserName, onlineUserNamezero)
-            return creations
+            memberid = checkUser(localUserName, onlineUserNamezero)
+            #return creations
+            return (memberid, num_of_pages)
 
         # There is only one name to check
         elif r1 is not None:
-            checkUser(localUserName, onlineUserName,
+            memberid = checkUser(localUserName, onlineUserName,
                       onlineUserNamezero)
-            return creations
+            #return creations
+            return (memberid, num_of_pages)
 
     # This is the second search
     elif take2:
         # There are two possible names to check
         if r1 is None:
-            checkUser(localUserName, onlineUserNamezero, take2=True)
-            return creations
+            memberid = checkUser(localUserName, onlineUserNamezero, take2=True)
+            #return creations
+            return (memberid, num_of_pages)
 
         # There is only one name to check
         elif r1 is not None:
-            checkUser(localUserName, onlineUserName,
+            memberid = checkUser(localUserName, onlineUserName,
                       onlineUserNamezero, take2=True)
-            return creations
+            #return creations
+            return (memberid, num_of_pages)
 
 
 def checkUser(locuser1, webuser1, webuser0=None, take2=False):
@@ -299,14 +306,43 @@ os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
 # Search for the username on the Creation Lab
-creations = searchUser(localUserName, take2=False)
+memberid, num_of_pages = searchUser(localUserName, take2=False)
 print("\nYour Creations are now downloading, {0}.\n".format(
     localUserName))
+
+print(memberid, num_of_pages)
 
 # Create folder to save files in,
 # unless it already exists
 if not os.path.exists(localUserName):
     os.mkdir(localUserName)
+
+# List of Creations
+creations = []
+
+user_url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
+user_r = requests.get(user_url).content
+user_soup = BeautifulSoup(user_r)
+# Add the creations from page 1 to the list
+for user_link in user_soup.find_all('a'):
+    if user_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+        creations.append('http://universe.lego.com{0}'.format(
+            user_link.get('href')))
+
+# If there is more than one page of Creations,
+# add the creations from the other pages to the list
+if num_of_pages > 1:
+    new_url = user_url[:-1]
+    while num_of_pages != 0:
+        page_url = "{0}{1}".format(new_url, num_of_pages)
+        num_of_pages -= 1
+
+        req = requests.get(page_url).content
+        soup = BeautifulSoup(req)
+        for page_link in soup.find_all('a'):
+            if page_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+                creations.append('http://universe.lego.com{0}'.format(
+                    page_link.get('href')))
 
 # ------- Information Gathering ------- #
 

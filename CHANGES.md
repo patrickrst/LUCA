@@ -48,7 +48,6 @@ _Released Unknown_
 * Properly filter illegal characters in folder names
 * Display images in proper order
 * Write HTML files using binary mode (`wb`, `ab`)
-* Removed redundant Creation download code
 * Download all Creations by a user (fixes multiple pages bug)
 * Added app icon (`LUCAIcon.ico`)
 * Rename `LICENSE` to `LICENSE.txt`
