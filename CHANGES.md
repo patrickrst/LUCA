@@ -3,7 +3,7 @@ LUCA Changes
 
 1.0
 ---
-_Released Unknown_
+_Released October 12, 2013_
 
 * More script comments
 * Small variable updates
@@ -54,6 +54,7 @@ _Released Unknown_
 * Fixed display of tags
 * Various HTML fixes
 * PEP 8 checks
+* Restored memberid code
 * Remove debug prints
 * Wrap all code in functions
 * Adapt Date field for Creations from LEGO Universe competitions
