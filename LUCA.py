@@ -101,62 +101,136 @@ def searchUser(username, take2=False):
     """
 
     # Check if index 1 contains the localUserName
-    #FIXME: This can throw an IndexError
-    r1 = requests.get(creations[1]).content
+    try:
+        r1 = requests.get(creations[1]).content
+
+    # For the people who uploaded only a few things
+    except IndexError:
+        r1 = None
     # Check if index 0 contains the localUserName
     rzero = requests.get(creations[0]).content
 
-    # Get the username from index 1
-    soup1 = BeautifulSoup(r1)
-    onlineUserName = soup1.find(
-        id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+    if r1 is not None:
+        # Get the username from index 1
+        soup1 = BeautifulSoup(r1)
+        onlineUserName = soup1.find(
+            id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
 
     # Get the username from index 0
     soupzero = BeautifulSoup(rzero)
     onlineUserNamezero = soupzero.find(
         id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
 
+    # This is not the second search
+    if not take2:
+        # There are two possible names to check
+        if r1 is None:
+            memberid = checkUser(localUserName, onlineUserNamezero, url)
+            return (memberid, url)
+
+        # There is only one name to check
+        elif r1 is not None:
+            memberid = checkUser(localUserName, onlineUserName, url, onlineUserNamezero)
+            return (memberid, url)
+
+    # This is the second search
+    elif take2:
+        # There are two possible names to check
+        if r1 is None:
+            memberid = checkUser(localUserName, onlineUserNamezero, url, take2=True)
+            return (memberid, url)
+
+        # There is only one name to check
+        elif r1 is not None:
+            memberid = checkUser(localUserName, onlineUserName, url, onlineUserNamezero, take2=True)
+            return (memberid, url)
+
+def checkUser(locuser1, webuser1, url, webuser0=None, take2=False):
+    """Checks if this is the proper username"""
+    # Create string versions of the usernames
+    locuser1 = str(locuser1)
+
     # The username entered matched index 1,
     # begin downloading the creations
-    if localUserName.lower() == onlineUserName.string.lower():
-        memberid = onlineUserName.get('href')[63:99]
-        print("\nYour Creations are now downloading, {0}.\n".format(
-              localUserName))
+    if locuser1.lower() == webuser1.string.lower():
+        #print("match 1")
+        memberid = webuser1.get('href')[63:99]
         return memberid
 
     # Index 1 does not contiain the username
-    elif localUserName.lower() != onlineUserName.string.lower():
+    else:
+        #print("fail 1")
 
-        # The username entered matched index 0,
-        # begin downloading the creations
-        if localUserName.lower() == onlineUserNamezero.string.lower():
-            memberid = onlineUserNamezero.get('href')[63:99]
-            print("\nYour Creations are now downloading, {0}.\n".format(
-                localUserName))
-            return memberid
+        # If the secondary names are not provided
+        if webuser0 is None:
+            #print(None)
 
-        # Index 0 does not contiain the username
-        elif localUserName.lower() != onlineUserNamezero.string.lower():
             # Search again, using a different query
             if not take2:
-                searchUser(username, take2=True)
+                #print("not take2")
+                searchUser(locuser1, take2=True)
 
             # The name could not be found, close LUCA.
+            elif take2:
+                #print("take2")
+
+                # The secondary username entered matched index 0,
+                # begin downloading the creations
+                if locuser1.lower() == webuser0.string.lower():
+                    #print("match 2")
+                    memberid = webuser0.get('href')[63:99]
+                    return memberid
+                else:
+                    print('The username "{0}" does not appear to match with any usernames online.'
+                          .format(localUserName))
+                    input("\nPress Enter to close LUCA.")
+                    raise SystemExit(0)
+
+        elif webuser0 is not None:
+            #print("Not None")
+
+            # The secondary username entered matched index 0,
+            # begin downloading the creations
+            print(locuser1, webuser0)
+            if locuser1.lower() == webuser0.string.lower():
+                #print("match 2")
+                print(locuser1, webuser0.string)
+                memberid = webuser0.get('href')[63:99]
+                return memberid
+
+            # The secondary names could not be found, close LUCA.
             else:
-                print('The username "{0}" does not appear to match with any usernames online.'
-                      .format(localUserName))
-                input("\nPress Enter to close LUCA.")
-                raise SystemExit(0)
+                #print("fail 2")
+                # Search again, using a different query
+                if not take2:
+                    searchUser(locuser1, take2=True)
+
+                    # The secondary username entered matched index 0,
+                # begin downloading the creations
+                if locuser1.lower() == webuser0.string.lower():
+                    #print("match 2")
+                    memberid = webuser0.get('href')[63:99]
+                    return memberid
+
+                else:
+                    print("final fail")
+                    # The name could not be found, close LUCA.
+                    print('The username "{0}" does not appear to match with any usernames online.'
+                          .format(localUserName))
+                    input("\nPress Enter to close LUCA.")
+                    raise SystemExit(0)
+
+
 
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
 # Search for the username on the Creation Lab
-memberid = searchUser(localUserName, take2=False)
+memberid, url = searchUser(localUserName, take2=False)
+print("\nYour Creations are now downloading, {0}.\n".format(
+    localUserName))
 
-url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(
-    memberid)
 r = requests.get(url).content
 soup = BeautifulSoup(r)
 
