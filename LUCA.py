@@ -73,14 +73,17 @@ def searchUser(username, take2=False):
     """Find a username on the Creation Lab"""
     # Set initial page number
     num_of_pages = 1
-    # Backup search method for finding the username on the Creation Lab
+
     if take2:
+        # Backup search method for finding the username on the Creation Lab
+        print("take2")
         url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48&page={1}".format(
-            localUserName, num_of_pages)
+            username, num_of_pages)
     else:
+        print("not take2")
         # Search the username on the Creation Lab
         url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48&page={1}".format(
-            localUserName, num_of_pages)
+            username, num_of_pages)
 
     # Get search page content
     r = requests.get(url).content
@@ -128,172 +131,117 @@ Rating''', "")
             creations.append('http://universe.lego.com{0}'.format(
                 link.get('href')))
 
-    ## If there is more than one page of Creations,
-    ## add the creations from the other pages to the list
-    #if num_of_pages > 1:
-        #new_url = user_url[:-1]
-        #while num_of_pages != 0:
-            #page_url = "{0}{1}".format(new_url, num_of_pages)
-            #num_of_pages -= 1
-
-            #req = requests.get(page_url).content
-            #soup = BeautifulSoup(req)
-            #for page_link in soup.find_all('a'):
-                #if page_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-                    #creations.append('http://universe.lego.com{0}'.format(
-                        #page_link.get('href')))
-
     # Check if links were found/added for the entered username
     # If not, close LUCA
     if not creations:
         print('The username "{0}" was not found on the Creation Lab.'.format(
-            localUserName))
+            username))
         input("\nPress Enter to close LUCA.")
         raise SystemExit(0)
 
-    """
-    Index 1 gives the best chance of finding the username,
-    but index 0 is needed for those who uploaded very few Creations.
-    """
+    num_of_creations = len(creations) - 1
+    names = []
 
-    # Check if index 1 contains the localUserName
-    try:
-        r1 = requests.get(creations[1]).content
-    # For the people who uploaded only a few things
-    except IndexError:
-        r1 = None
-
-    # Check if index 0 contains the localUserName
-    rzero = requests.get(creations[0]).content
-
-    if r1 is not None:
-        # Get the username from index 1
-        soup1 = BeautifulSoup(r1)
-        onlineUserName = soup1.find(
+    # Get the usernames from all Creations from the search
+    while num_of_creations != -1:
+        r = requests.get(creations[num_of_creations]).content
+        soup = BeautifulSoup(r)
+        onlineUserName = soup.find(
             id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
-        print(onlineUserName.string)
+        names.append(onlineUserName)
+        num_of_creations -= 1
 
-    # Get the username from index 0
-    soupzero = BeautifulSoup(rzero)
-    onlineUserNamezero = soupzero.find(
-        id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
-    print(onlineUserNamezero.string)
-
-    # This is not the second search
+    # These are the first search results
     if not take2:
-        # There are two possible names to check
-        if r1 is None:
-            memberid = checkUser(localUserName, onlineUserNamezero)
-            #return creations
-            return (memberid, num_of_pages)
+        memberid = checkUser(username, names, take2=False)
+        return (memberid, num_of_pages)
 
-        # There is only one name to check
-        elif r1 is not None:
-            memberid = checkUser(localUserName, onlineUserName,
-                      onlineUserNamezero)
-            #return creations
-            return (memberid, num_of_pages)
-
-    # This is the second search
+    # These are the second search results
     elif take2:
-        # There are two possible names to check
-        if r1 is None:
-            memberid = checkUser(localUserName, onlineUserNamezero, take2=True)
-            #return creations
-            return (memberid, num_of_pages)
-
-        # There is only one name to check
-        elif r1 is not None:
-            memberid = checkUser(localUserName, onlineUserName,
-                      onlineUserNamezero, take2=True)
-            #return creations
-            return (memberid, num_of_pages)
+        memberid = checkUser(username, names, take2=True)
+        #main(True, memberid=memberid, num_of_pages=num_of_pages, localUserName=username)
+        return (memberid, num_of_pages)
 
 
-def checkUser(locuser1, webuser1, webuser0=None, take2=False):
+def checkUser(locuser, webusers, take2=False):
     """Checks if this is the proper username"""
-    # We are using the first query results
-    if not take2:
-        print("not take2")
+    # Get the proper index of all the names to check
+    num_of_names = len(webusers) - 1
+    print(num_of_names)
+    found_name = True
 
-        # The username entered matched index 1,
+    while num_of_names > -1:
+        # The username entered was found
         # begin downloading the creations
-        if locuser1.lower() == webuser1.string.lower():
-            print("match 1")
-            memberid = webuser1.get('href')[63:99]
+        if locuser.lower() == webusers[num_of_names].string.lower():
+            memberid = webusers[num_of_names].get('href')[63:99]
             return memberid
 
-        # Index 1 does not contiain the username
+        # That username did not match, try next one
+        #elif locuser.lower() != webusers[num_of_names].string.lower():
         else:
-            print("fail 1")
+            num_of_names -= 1
+            found_name = False
 
-            # If the secondary name are not provided
-            if webuser0 is None:
-                print("webuser0 is None")
-
-                # Search again, using a different query
-                searchUser(locuser1, take2=True)
-
-            elif webuser0 is not None:
-                print("webuser0 is not None")
-
-                # The secondary username entered matched index 0,
-                # begin downloading the creations
-                if locuser1.lower() == webuser0.string.lower():
-                    print("match 2")
-                    memberid = webuser0.get('href')[63:99]
-                    return memberid
-
-                # The secondary names could not be found, close LUCA.
-                else:
-                    print("fail 2")
-                    print('The username "{0}" does not appear to match with any usernames online.'
-                          .format(localUserName))
-                    input("\nPress Enter to close LUCA.")
-                    raise SystemExit(0)
+    # We are using the first search results
+    if not take2:
+        #print("not take2")
+        # Search again, using a different query
+        if not found_name:
+            searchUser(locuser, take2=True)
 
     # We are using the second query results
-    elif take2:
-        print("take2")
+    if take2:
+        #print("take2")
+        # The username could not be found
+        if not found_name:
+            #print("final fail")
+            print('The username "{0}" does not appear to match with any usernames online.'
+                  .format(locuser))
+            input("\nPress Enter to close LUCA.")
+            raise SystemExit(0)
 
-        # The username entered matched index 1,
-        # begin downloading the creations
-        if locuser1.lower() == webuser1.string.lower():
-            print("match 1")
-            memberid = webuser1.get('href')[63:99]
-            return memberid
 
-        # Index 1 does not contiain the username
-        else:
-            print("fail 1")
+        #while num_of_names != -1:
 
-            # If the secondary name are not provided
-            if webuser0 is None:
-                print("webuser0 is None")
+            ## The username entered was found
+            ## begin downloading the creations
+            #if locuser.lower() == webusers[num_of_names].string.lower():
+                #memberid = webusers[num_of_names].get('href')[63:99]
+                #return memberid
 
-                print("final fail")
-                print('The username "{0}" does not appear to match with any usernames online.'
-                      .format(localUserName))
-                input("\nPress Enter to close LUCA.")
-                raise SystemExit(0)
+            ## That username did not match, try next one
+            #else:
+                #num_of_names -= 1
 
-            elif webuser0 is not None:
-                print("webuser0 is not None")
 
-                # The secondary username entered matched index 0,
-                # begin downloading the creations
-                if locuser1.lower() == webuser0.string.lower():
-                    print("match 2")
-                    memberid = webuser0.get('href')[63:99]
-                    return memberid
 
-                # The secondary names could not be found, close LUCA.
-                else:
-                    print("final fail")
-                    print('The username "{0}" does not appear to match with any usernames online.'
-                          .format(localUserName))
-                    input("\nPress Enter to close LUCA.")
-                    raise SystemExit(0)
+    # We are using the second query results
+    #elif take2:
+        #print("take2")
+
+        # Let's assume search 2 will find it
+        #found_name = True
+
+        #while num_of_names != -1:
+
+            ## The username entered was found
+            ## begin downloading the creations
+            #if locuser.lower() == webusers[num_of_names].string.lower():
+                #memberid = webusers[num_of_names].get('href')[63:99]
+                #return memberid
+
+            ## That username did not match, try next one
+            #else:
+                #num_of_names -= 1
+                #found_name = False
+
+        ## The username could not be found
+        #if not found_name:
+            #print('The username "{0}" does not appear to match with any usernames online.'
+                  #.format(locuser))
+            #input("\nPress Enter to close LUCA.")
+            #raise SystemExit(0)
 
 
 def byteme(text):
@@ -301,206 +249,209 @@ def byteme(text):
     bin_text = str.encode(text, encoding="utf-8", errors="strict")
     return bin_text
 
-# Write window title
-os.system("title {0} v{1}".format(app, majver))
-localUserName = input("\nEnter your Creation Lab Username: ")
 
-# Search for the username on the Creation Lab
-memberid, num_of_pages = searchUser(localUserName, take2=False)
-print("\nYour Creations are now downloading, {0}.\n".format(
-    localUserName))
+def main(userfound=False, memberid=False, num_of_pages=False, localUserName=False):
+    """Main LUCA Process"""
+    if not userfound:
+        localUserName = input("\nEnter your Creation Lab Username: ")
+        #print('Searching the Creation Lab for user "{0}"'.format(localUserName))
+        # Search for the username on the Creation Lab
+        memberid, num_of_pages = searchUser(localUserName, take2=False)
 
-print(memberid, num_of_pages)
+    print("\nYour Creations are now downloading, {0}.\n".format(
+        localUserName))
 
-# Create folder to save files in,
-# unless it already exists
-if not os.path.exists(localUserName):
-    os.mkdir(localUserName)
+    print(memberid, num_of_pages, localUserName)
 
-# List of Creations
-creations = []
+    # Create folder to save files in,
+    # unless it already exists
+    if not os.path.exists(localUserName):
+        os.mkdir(localUserName)
 
-user_url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
-user_r = requests.get(user_url).content
-user_soup = BeautifulSoup(user_r)
-# Add the creations from page 1 to the list
-for user_link in user_soup.find_all('a'):
-    if user_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-        creations.append('http://universe.lego.com{0}'.format(
-            user_link.get('href')))
+    # List of Creations
+    creations = []
 
-# If there is more than one page of Creations,
-# add the creations from the other pages to the list
-if num_of_pages > 1:
-    new_url = user_url[:-1]
-    while num_of_pages != 0:
-        page_url = "{0}{1}".format(new_url, num_of_pages)
-        num_of_pages -= 1
+    user_url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?memberid={0}&show=48".format(memberid)
+    user_r = requests.get(user_url).content
+    user_soup = BeautifulSoup(user_r)
+    # Add the creations from page 1 to the list
+    for user_link in user_soup.find_all('a'):
+        if user_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+            creations.append('http://universe.lego.com{0}'.format(
+                user_link.get('href')))
 
-        req = requests.get(page_url).content
-        soup = BeautifulSoup(req)
-        for page_link in soup.find_all('a'):
-            if page_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-                creations.append('http://universe.lego.com{0}'.format(
-                    page_link.get('href')))
+    # If there is more than one page of Creations,
+    # add the creations from the other pages to the list
+    if num_of_pages > 1:
+        new_url = user_url[:-1]
+        while num_of_pages != 0:
+            page_url = "{0}{1}".format(new_url, num_of_pages)
+            num_of_pages -= 1
 
-# ------- Information Gathering ------- #
+            req = requests.get(page_url).content
+            soup = BeautifulSoup(req)
+            for page_link in soup.find_all('a'):
+                if page_link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+                    creations.append('http://universe.lego.com{0}'.format(
+                        page_link.get('href')))
 
-for creation in creations:
-    r = requests.get(creation).content
-    soup = BeautifulSoup(r)
+    # ------- Information Gathering ------- #
 
-    title = soup.find_all('h1')[2]
-     # add .string to get only the text
-    titleString = title.string
-    titleString = titleString.replace('/', '')
-    titleString = titleString.strip()
-    description = soup.find(id="creationInfoText")
-    tags = soup.find_all(class_='column-round-body')[3].contents[9]
-    challenge = soup.find(id="CreationChallenge").contents[1].contents[1]
+    for creation in creations:
+        r = requests.get(creation).content
+        soup = BeautifulSoup(r)
 
-    date = soup.find(id="CreationUser")
-    date.div.decompose()
-    date.a.decompose()
+        title = soup.find_all('h1')[2]
+         # add .string to get only the text
+        titleString = title.string
+        titleString = titleString.replace('/', '')
+        titleString = titleString.strip()
+        description = soup.find(id="creationInfoText")
+        tags = soup.find_all(class_='column-round-body')[3].contents[9]
+        challenge = soup.find(id="CreationChallenge").contents[1].contents[1]
 
-    # Create string versions of the text
-    title_str = str(title)
-    description_str = str(description)
-    date_str = str(date)
-    tags_str = str(tags)
+        date = soup.find(id="CreationUser")
+        date.div.decompose()
+        date.a.decompose()
 
-    # Update and fix original HTML errors
-    title_str = title_str.replace("</h1>", "")
-    title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h1>'.format(
-        title_str, "http://mln.lego.com/en-us/PublicView/", localUserName)
-    description_str = description_str.replace("</br></br></br></br></br></br>",
-                                              "")
-    description_str = description_str.replace("\t\t\t\t\t\t\t\t\t", "")
-    description_str = description_str.replace('''
-\t\t\t\t\t\t\t\t''', "")
-    tags_str = tags_str.lstrip('''<p>
-</p>''')
-    date_str = date_str.replace("\t\t\t\t\t\t\t\t\t", "")
-    date_str = date_str.replace("<br/>", "")
-    date_str = date_str.replace("\t\t\t\t\t\t\t\t", "")
-    date_str = date_str.replace('''<div class="column-round-body" id="CreationUser">
-<p>''', "")
-    date_str = date_str.replace('''
-''', "")
-    tags_str = tags_str.replace(r'<a href="',
-                                r'<<a target="_blank" href="http://universe.lego.com/en-us/community/creationlab/')
-    date_str = date_str.replace(r"</div>", "")
+        # Create string versions of the text
+        title_str = str(title)
+        description_str = str(description)
+        date_str = str(date)
+        tags_str = str(tags)
 
-    # List of non-HTML files to download
-    imgLinkList = []
-    i = 1
+        # Update and fix original HTML errors
+        title_str = title_str.replace("</h1>", "")
+        title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h1>'.format(
+            title_str, "http://mln.lego.com/en-us/PublicView/", localUserName)
+        description_str = description_str.replace("</br></br></br></br></br></br>",
+                                                  "")
+        description_str = description_str.replace("\t\t\t\t\t\t\t\t\t", "")
+        description_str = description_str.replace('''
+    \t\t\t\t\t\t\t\t''', "")
+        tags_str = tags_str.lstrip('''<p>
+    </p>''')
+        date_str = date_str.replace("\t\t\t\t\t\t\t\t\t", "")
+        date_str = date_str.replace("<br/>", "")
+        date_str = date_str.replace("\t\t\t\t\t\t\t\t", "")
+        date_str = date_str.replace('''<div class="column-round-body" id="CreationUser">
+    <p>''', "")
+        date_str = date_str.replace('''
+    ''', "")
+        tags_str = tags_str.replace(r'<a href="',
+                                    r'<<a target="_blank" href="http://universe.lego.com/en-us/community/creationlab/')
+        date_str = date_str.replace(r"</div>", "")
 
-    # Populate the list
-    for imgLink in soup.find_all('a'):
-        if imgLink.get('href')[0:13] == "GetMedia.aspx":
-            imgLinkList.append(
-                'http://universe.lego.com/en-us/community/creationlab/{0}'
-                .format(imgLink.get('href')))
+        # List of non-HTML files to download
+        imgLinkList = []
+        i = 1
 
-    # ------- Information Writing ------- #
+        # Populate the list
+        for imgLink in soup.find_all('a'):
+            if imgLink.get('href')[0:13] == "GetMedia.aspx":
+                imgLinkList.append(
+                    'http://universe.lego.com/en-us/community/creationlab/{0}'
+                    .format(imgLink.get('href')))
 
-    # The folders to which the creations will be saved
-    mainfilepath = os.path.join(os.getcwd(), localUserName)
+        # ------- Information Writing ------- #
 
-    # Check for illegal characters in the creation title
-    subfilepathclean = charCheck(titleString, True)
-    subfilepath = os.path.join(mainfilepath, subfilepathclean)
+        # The folders to which the creations will be saved
+        mainfilepath = os.path.join(os.getcwd(), localUserName)
 
-    # If the folder for each Creation does not exist, create it
-    if not os.path.exists(subfilepath):
-        os.makedirs(subfilepath)
+        # Check for illegal characters in the creation title
+        subfilepathclean = charCheck(titleString, True)
+        subfilepath = os.path.join(mainfilepath, subfilepathclean)
 
-    # List of images in Creation
-    image_list = []
+        # If the folder for each Creation does not exist, create it
+        if not os.path.exists(subfilepath):
+            os.makedirs(subfilepath)
 
-    for imgLink in imgLinkList:
-        r = requests.get(imgLink)
-        img = r.content
+        # List of images in Creation
+        image_list = []
 
-        # Original filename
-        filename = "{0}{1}".format(titleString, i)
+        for imgLink in imgLinkList:
+            r = requests.get(imgLink)
+            img = r.content
 
-        # Check for illegal characters in the filenames
-        filename = charCheck(filename)
+            # Original filename
+            filename = "{0}{1}".format(titleString, i)
 
-        # Write all non-HTML files.
-        with open(os.path.join(subfilepath, filename), 'wb') as newImg:
-            newImg.write(img)
+            # Check for illegal characters in the filenames
+            filename = charCheck(filename)
 
-        #  This is an GIF image
-        if imghdr.what(os.path.join(subfilepath, filename)) == "gif":
-            new_filename = "{0}.gif".format(filename)
-            os.replace(os.path.join(subfilepath, filename),
-                       os.path.join(subfilepath, new_filename))
+            # Write all non-HTML files.
+            with open(os.path.join(subfilepath, filename), 'wb') as newImg:
+                newImg.write(img)
 
-        # This is an JPG image
-        elif imghdr.what(os.path.join(subfilepath, filename)) == "jpeg":
-            new_filename = "{0}.jpg".format(filename)
-            os.replace(os.path.join(subfilepath, filename),
-                       os.path.join(subfilepath, new_filename))
-
-        else:
-            # Read the first 5 bytes of the file
-            with open(os.path.join(subfilepath, filename), "rb") as f:
-                header = f.readline(5)
-
-            # This is an LDD LXF model <http://ldd.lego.com/>
-            if header == b"PK\x03\x04\x14":
-                new_filename = "{0}.lxf".format(filename)
+            #  This is an GIF image
+            if imghdr.what(os.path.join(subfilepath, filename)) == "gif":
+                new_filename = "{0}.gif".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
 
-            # This is an WMV video
-            elif header == b"0&\xb2u\x8e":
-                new_filename = "{0}.wmv".format(filename)
+            # This is an JPG image
+            elif imghdr.what(os.path.join(subfilepath, filename)) == "jpeg":
+                new_filename = "{0}.jpg".format(filename)
                 os.replace(os.path.join(subfilepath, filename),
                            os.path.join(subfilepath, new_filename))
 
-            # This is an MPG video
-            elif header == b"\x00\x00\x01\xba!":
-                new_filename = "{0}.mpg".format(filename)
-                os.replace(os.path.join(subfilepath, filename),
-                           os.path.join(subfilepath, new_filename))
-
-            # This is an AVI video
-            # NOTE: This was found in an H.264 AVI file
-            elif header == b"\x00\x00\x00\x1cf":
-                new_filename = "{0}.mpg".format(filename)
-                os.replace(os.path.join(subfilepath, filename),
-                           os.path.join(subfilepath, new_filename))
-
-            # This is MOV video
             else:
-                new_filename = "{0}.mov".format(filename)
-                os.replace(os.path.join(subfilepath, filename),
-                           os.path.join(subfilepath, new_filename))
+                # Read the first 5 bytes of the file
+                with open(os.path.join(subfilepath, filename), "rb") as f:
+                    header = f.readline(5)
 
-            """
-            The AVI and MOV file type is a container, meaning different types
-            of codecs (what the real format is) can vary.
-            In this sense, AVI and MOV file detection is fuzzy.
-            """
+                # This is an LDD LXF model <http://ldd.lego.com/>
+                if header == b"PK\x03\x04\x14":
+                    new_filename = "{0}.lxf".format(filename)
+                    os.replace(os.path.join(subfilepath, filename),
+                               os.path.join(subfilepath, new_filename))
 
-        # Display filename after it was installed,
-        # part of LUCA's non-GUI progress bar.
-        try:
-            print(new_filename)
-        # If for some VERY strange reason if the filename cannot be displayed
-        except UnicodeEncodeError:
-            print("Filename display error. Creation saved!")
-            pass
+                # This is an WMV video
+                elif header == b"0&\xb2u\x8e":
+                    new_filename = "{0}.wmv".format(filename)
+                    os.replace(os.path.join(subfilepath, filename),
+                               os.path.join(subfilepath, new_filename))
 
-        i += 1
-        image_list.append(new_filename)
-        img_num = len(image_list)
+                # This is an MPG video
+                elif header == b"\x00\x00\x01\xba!":
+                    new_filename = "{0}.mpg".format(filename)
+                    os.replace(os.path.join(subfilepath, filename),
+                               os.path.join(subfilepath, new_filename))
 
-    # HTML document structure
-    page = '''<!-- Creation archive saved by LUCA v{11} on {0} UTC
+                # This is an AVI video
+                # NOTE: This was found in an H.264 AVI file
+                elif header == b"\x00\x00\x00\x1cf":
+                    new_filename = "{0}.mpg".format(filename)
+                    os.replace(os.path.join(subfilepath, filename),
+                               os.path.join(subfilepath, new_filename))
+
+                # This is MOV video
+                else:
+                    new_filename = "{0}.mov".format(filename)
+                    os.replace(os.path.join(subfilepath, filename),
+                               os.path.join(subfilepath, new_filename))
+
+                """
+                The AVI and MOV file type is a container, meaning different types
+                of codecs (what the real format is) can vary.
+                In this sense, AVI and MOV file detection is fuzzy.
+                """
+
+            # Display filename after it was installed,
+            # part of LUCA's non-GUI progress bar.
+            try:
+                print(new_filename)
+            # If for some VERY strange reason if the filename cannot be displayed
+            except UnicodeEncodeError:
+                print("Filename display error. Creation saved!")
+                pass
+
+            i += 1
+            image_list.append(new_filename)
+            img_num = len(image_list)
+
+        # HTML document structure
+        page = '''<!-- Creation archive saved by LUCA v{11} on {0} UTC
 https://github.com/Brickever/LUCA#readme
 https://github.com/le717/LUCA#readme -->
 
@@ -516,6 +467,7 @@ https://github.com/le717/LUCA#readme -->
     {5}
     </style>
 </head>
+
 <body>
 {6}
 <div class="line-separator"></div>
@@ -530,44 +482,44 @@ https://github.com/le717/LUCA#readme -->
 
 <h2>Images</h2>
 <div id="pictures">'''.format(
-        time.strftime("%c", time.gmtime()), titleString,
-        "body { background-color: #212121; color: white; text-align: center;}",
-        "h1, h2 {font-family: sans-serif; }",
-        '''.line-separator {
-    height:1px; background:#717171;
-    border-bottom:1px solid #313030;
-    }''',
-        "a { color: #A9A9A9; text-decoration: none;}",
-        title_str, localUserName, challenge, date_str, description_str,
-        majver)
+            time.strftime("%c", time.gmtime()), titleString,
+            "body { background-color: #212121; color: white; text-align: center;}",
+            "h1, h2 {font-family: sans-serif; }",
+            '''.line-separator {
+        height:1px; background:#717171;
+        border-bottom:1px solid #313030;
+        }''',
+            "a { color: #A9A9A9; text-decoration: none;}",
+            title_str, localUserName, challenge, date_str, description_str,
+            majver)
 
-    # Original HTML filename
-    HTMLfilename = "{0}.html".format(titleString)
+        # Original HTML filename
+        HTMLfilename = "{0}.html".format(titleString)
 
-    # Check for illegal characters in the filenames
-    HTMLfilename = charCheck(HTMLfilename)
+        # Check for illegal characters in the filenames
+        HTMLfilename = charCheck(HTMLfilename)
 
-    # Write initial HTML document structure
-    with open(os.path.join(subfilepath, HTMLfilename), "wb") as newHTML:
-        newHTML.write(byteme(page))
+        # Write initial HTML document structure
+        with open(os.path.join(subfilepath, HTMLfilename), "wb") as newHTML:
+            newHTML.write(byteme(page))
 
-    im = 0
-    while im < img_num:
+        im = 0
+        while im < img_num:
 
-        # Code to display every image
-        img_display = '''
+            # Code to display every image
+            img_display = '''
 <a title="Click for larger image" href="{0}"><img src="{0}" width="300" /></a>'''.format(
-            image_list[im])
+                image_list[im])
 
-        # Write the HTML for the images
-        with open(os.path.join(subfilepath, HTMLfilename), "ab") as updateHTML:
-            updateHTML.write(byteme("{0}".format(img_display)))
-        # Display each image once
-        im += 1
+            # Write the HTML for the images
+            with open(os.path.join(subfilepath, HTMLfilename), "ab") as updateHTML:
+                updateHTML.write(byteme("{0}".format(img_display)))
+            # Display each image once
+            im += 1
 
-    # Write the final HTML code
-    with open(os.path.join(subfilepath, HTMLfilename), "ab") as finishHTML:
-        finishHTML.write(byteme('''
+        # Write the final HTML code
+        with open(os.path.join(subfilepath, HTMLfilename), "ab") as finishHTML:
+            finishHTML.write(byteme('''
 </div>
 <br>
 <div class="line-separator"></div>
@@ -582,48 +534,52 @@ Tags
 {1}
 </body>
 </html>
-'''.format(creation, tags_str)))
+    '''.format(creation, tags_str)))
 
-    # Display filename after it was installed,
-    # part of LUCA's non-GUI progress bar.
-    try:
-        print(HTMLfilename)
-    # If for some VERY strange reason if the filename cannot be displayed
-    except UnicodeEncodeError:
-        print("Filename display error. Creation saved!")
-        pass
+        # Display filename after it was installed,
+        # part of LUCA's non-GUI progress bar.
+        try:
+            print(HTMLfilename)
+        # If for some VERY strange reason if the filename cannot be displayed
+        except UnicodeEncodeError:
+            print("Filename display error. Creation saved!")
+            pass
 
+    # ------- Final Actions ------- #
 
-# ------- Final Actions ------- #
+    # Get list of all downloaded files
+    num_of_files = []
+    for root, dirnames, filenames in os.walk(mainfilepath):
 
-# Get list of all downloaded files
-num_of_files = []
-for root, dirnames, filenames in os.walk(mainfilepath):
+        # Remove Thumbs.db from list
+        if "Thumbs.db" in filenames:
+            filenames.remove("Thumbs.db")
 
-    # Remove Thumbs.db from list
-    if "Thumbs.db" in filenames:
-        filenames.remove("Thumbs.db")
+        # Remove ehthumbs.db from list
+        if "ehthumbs.db" in filenames:
+            filenames.remove("ehthumbs.db")
 
-    # Remove ehthumbs.db from list
-    if "ehthumbs.db" in filenames:
-        filenames.remove("ehthumbs.db")
+        # Remove Desktop.ini from list
+        if "Desktop.ini" in filenames:
+            filenames.remove("Desktop.ini")
 
-    # Remove Desktop.ini from list
-    if "Desktop.ini" in filenames:
-        filenames.remove("Desktop.ini")
+        # How many files were downloaded?
+        for files in filenames:
+            myfiles = os.path.join(root, files)
+            num_of_files.append(myfiles)
 
-    # How many files were downloaded?
-    for files in filenames:
-        myfiles = os.path.join(root, files)
-        num_of_files.append(myfiles)
-
-# Display success message containing number
-# of files downloaded from number of Creations, and where they were saved.
-print('''
+    # Display success message containing number
+    # of files downloaded from number of Creations, and where they were saved.
+    print('''
 {0} files from {1} Creations successfully downloaded and saved to
 "{2}"'''.format(
-    len(num_of_files),
-    len(os.listdir(mainfilepath)),
-    mainfilepath))
-input("\nPress Enter to close LUCA.")
-raise SystemExit(0)
+        len(num_of_files),
+        len(os.listdir(mainfilepath)),
+        mainfilepath))
+    input("\nPress Enter to close LUCA.")
+    raise SystemExit(0)
+
+if __name__ == "__main__":
+    # Write window title
+    os.system("title {0} v{1}".format(app, majver))
+    main()
