@@ -8,6 +8,8 @@ TODO
 * [ ] ~~Add creation comments to the HTML file~~ (Not possible)
 * [x] Create stylesheet
 * [x] Add a progress bar
+* [-] Accurately get username
+* [ ] Multiple pages of Creations
 
 ### Legend ###
 * [ ] ---> Todo
