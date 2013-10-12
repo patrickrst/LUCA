@@ -1,8 +1,6 @@
-**LUCA is currently in development, NOT intented for general use (yet)!**
-
 LUCA
 ====
-The **LEGO Universe Creation (Lab) Archiver** is a command-line tool to backup creations uploaded to the [LEGO Universe Creation Lab](http://universe.lego.com/en-us/community/creationlab/displaychallengelist.aspx). 
+The **LEGO Universe Creation (Lab) Archiver** is a command-line tool to backup creations uploaded to the [LEGO Universe Creation Lab](http://universe.lego.com/en-us/community/creationlab/displaychallengelist.aspx).
 
 
 Prerequisites
