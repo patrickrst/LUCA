@@ -17,7 +17,7 @@ _Released Unknown_
 * Remove `ehthumbs.db` from number of files downloaded
 * Display link in HTML from where Creation was downloaded from
 * Write HTML comment stating when and how Creation was archived
-* Express archive time in UTC timestamp
+* Express archive time in UTC time stamp
 * Fixed multiple errors in raw HTML
 * Add new HTML headers
 * Remove `Desktop.ini` from number of files downloaded
@@ -29,9 +29,9 @@ _Released Unknown_
 * Added GIF, JPG, WMV, and LXF file type detection
 * Tell how many Creations were downloaded
 * Added MPG video file type detection
-* Completely rewrote the illegal chracter check
+* Completely rewrote the illegal character check
 * Improved method of detecting username (again)
-* Expanded rewritten illegal chracter check to HTML documents
+* Expanded rewritten illegal character check to HTML documents
 * Detect and replace all illegal characters
 * Added MOV and AVI video file type detection
 * Do not display filename if `UnicodeEncodeError` is raised
@@ -47,6 +47,10 @@ _Released Unknown_
 * Improved chances of finding a username
 * Properly filter illegal characters in folder names
 * Display images in proper order
+* Write HTML files using binary mode (`wb`, `ab`)
+* Removed redundant Creation download code
+* Download all Creations by a user (fixes multiple pages bug)
+* Added app icon (`LUCAIcon.ico`)
 
 0.3
 ---

@@ -37,7 +37,6 @@ def charCheck(text, folders=False):
 
     if folders:
         illegal_chars.append(".")
-    #print(illegal_chars)
     found_chars = []
 
     # Get the length of the text, minus one for proper indexing
@@ -67,27 +66,79 @@ def charCheck(text, folders=False):
         for char in found_chars:
             # Replace it (them) with a space
             text = text.replace(char, "-")
-        return text
     return text
 
 
 def searchUser(username, take2=False):
     """Find a username on the Creation Lab"""
+    # Set initial page number
+    num_of_pages = 1
     # Backup search method for finding the username on the Creation Lab
     if take2:
-        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48".format(
-        localUserName)
+        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48&page={1}".format(
+        localUserName, num_of_pages)
     else:
         # Search the username on the Creation Lab
-        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48".format(
-            localUserName)
+        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48&page={1}".format(
+            localUserName, num_of_pages)
 
+    # Get search page content
     r = requests.get(url).content
     soup = BeautifulSoup(r)
+
+    # Find area containing number of pages
+    num_of_pages = soup.find("p", class_="column-navigation").get_text()
+
+    # Remove unneeded text: part 1
+    num_of_pages = num_of_pages.replace('''
+\t\t\t\t\t\t»
+Show:
+
+12
+24
+36
+48
+
+Order:
+
+Most Recent
+Oldest
+Rating''', "")
+
+    # Remove unneeded text: part 2
+    num_of_pages = num_of_pages.replace('''\r
+\t\t\t\t\t\t\xad\r
+\t\t\t\t\t\t«\r
+\t\t\t\t\t\t\t\r
+\t\t\t\t\t\t''', "")
+
+    # Remove unneeded text: part 3
+    num_of_pages = num_of_pages.replace("\r\n\t\t\t\t\t\t\r\n\n", "")
+    num_of_pages = num_of_pages.replace("1 of ", "")
+
+    # Convert the number to an integer
+    num_of_pages = int(num_of_pages)
+
+    # List of Creations
     creations = []
+    # Add the creations from page 1 to the list
     for link in soup.find_all('a'):
         if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
             creations.append('http://universe.lego.com{0}'.format(link.get('href')))
+
+    # If there is more than one page of Creations,
+    # add the creations from the other pages to the list
+    if num_of_pages > 1:
+        new_url = url[:-1]
+        while num_of_pages != 0:
+            url = "{0}{1}".format(new_url, num_of_pages)
+            num_of_pages -= 1
+
+            req = requests.get(url).content
+            soup = BeautifulSoup(req)
+            for link in soup.find_all('a'):
+                if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
+                    creations.append('http://universe.lego.com{0}'.format(link.get('href')))
 
     # Check if links were found/added for the entered username
     # If not, close LUCA
@@ -105,10 +156,10 @@ def searchUser(username, take2=False):
     # Check if index 1 contains the localUserName
     try:
         r1 = requests.get(creations[1]).content
-
     # For the people who uploaded only a few things
     except IndexError:
         r1 = None
+
     # Check if index 0 contains the localUserName
     rzero = requests.get(creations[0]).content
 
@@ -127,28 +178,30 @@ def searchUser(username, take2=False):
     if not take2:
         # There are two possible names to check
         if r1 is None:
-            memberid = checkUser(localUserName, onlineUserNamezero, url)
-            return (memberid, url)
+            checkUser(localUserName, onlineUserNamezero)
+            return creations
 
         # There is only one name to check
         elif r1 is not None:
-            memberid = checkUser(localUserName, onlineUserName, url, onlineUserNamezero)
-            return (memberid, url)
+            checkUser(localUserName, onlineUserName,
+                                 onlineUserNamezero)
+            return creations
 
     # This is the second search
     elif take2:
         # There are two possible names to check
         if r1 is None:
-            memberid = checkUser(localUserName, onlineUserNamezero, url, take2=True)
-            return (memberid, url)
+            checkUser(localUserName, onlineUserNamezero, take2=True)
+            return creations
 
         # There is only one name to check
         elif r1 is not None:
-            memberid = checkUser(localUserName, onlineUserName, url, onlineUserNamezero, take2=True)
-            return (memberid, url)
+            checkUser(localUserName, onlineUserName,
+                                 onlineUserNamezero, take2=True)
+            return creations
 
 
-def checkUser(locuser1, webuser1, url, webuser0=None, take2=False):
+def checkUser(locuser1, webuser1, webuser0=None, take2=False):
     """Checks if this is the proper username"""
     # Create string versions of the usernames
     locuser1 = str(locuser1)
@@ -223,28 +276,25 @@ def checkUser(locuser1, webuser1, url, webuser0=None, take2=False):
                     input("\nPress Enter to close LUCA.")
                     raise SystemExit(0)
 
+
+def byteme(text):
+    """Convert text to binary"""
+    bin_text = str.encode(text, encoding="utf-8", errors="strict")
+    return bin_text
+
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
 
 # Search for the username on the Creation Lab
-memberid, url = searchUser(localUserName, take2=False)
+creations = searchUser(localUserName, take2=False)
 print("\nYour Creations are now downloading, {0}.\n".format(
     localUserName))
-
-r = requests.get(url).content
-soup = BeautifulSoup(r)
 
 # Create folder to save files in,
 # unless it already exists
 if not os.path.exists(localUserName):
     os.mkdir(localUserName)
-
-creations = []
-for link in soup.find_all('a'):
-    if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-        creations.append('http://universe.lego.com{0}'.format(link.get('href')))
-
 
 # ------- Information Gathering ------- #
 
@@ -394,11 +444,12 @@ for creation in creations:
         i += 1
 
         image_list.append(new_filename)
-        img_num = len(image_list) - 1
+        img_num = len(image_list)
 
     # HTML document structure
-    page = '''<!-- Creation archive saved by LUCA on {0} UTC
-https://github.com/Brickever/LUCA#readme -->
+    page = '''<!-- Creation archive saved by LUCA v{11} on {0} UTC
+https://github.com/Brickever/LUCA#readme
+https://github.com/le717/LUCA#readme -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -429,7 +480,7 @@ https://github.com/Brickever/LUCA#readme -->
         "h1, h2 {font-family: sans-serif; }",
         ".line-separator{ height:1px; background:#717171; border-bottom:1px solid #313030; }",
         "a { color: #A9A9A9; text-decoration: none;}",
-        title_str, localUserName, challenge, date_str, description_str)
+        title_str, localUserName, challenge, date_str, description_str, majver)
 
     # Original HTML filename
     HTMLfilename = "{0}.html".format(titleString)
@@ -438,11 +489,11 @@ https://github.com/Brickever/LUCA#readme -->
     HTMLfilename = charCheck(HTMLfilename)
 
     # Write initial HTML document structure
-    with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:
-        newHTML.write(page)
+    with open(os.path.join(subfilepath, HTMLfilename), "wb") as newHTML:
+        newHTML.write(byteme(page))
 
     im = 0
-    while im < img_num + 1:
+    while im < img_num:
 
         # Code to display every image
         img_display = '''
@@ -450,14 +501,14 @@ https://github.com/Brickever/LUCA#readme -->
             image_list[im])
 
         # Write the HTML for the images
-        with open(os.path.join(subfilepath, HTMLfilename), "at") as updateHTML:
-            updateHTML.write("{0}".format(img_display))
+        with open(os.path.join(subfilepath, HTMLfilename), "ab") as updateHTML:
+            updateHTML.write(byteme("{0}".format(img_display)))
         # Display each image once
         im += 1
 
     # Write the final HTML code
-    with open(os.path.join(subfilepath, HTMLfilename), "at") as finishHTML:
-        finishHTML.write('''
+    with open(os.path.join(subfilepath, HTMLfilename), "ab") as finishHTML:
+        finishHTML.write(byteme('''
 </div>
 <br>
 <div class="line-separator"></div>
@@ -470,7 +521,7 @@ Original Creation Link:
 Tags {1}
 </body>
 </html>
-'''.format(creation, tags_str))
+'''.format(creation, tags_str)))
 
     # Display filename after it was installed,
     # part of LUCA's non-GUI progress bar.

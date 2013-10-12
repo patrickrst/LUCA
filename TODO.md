@@ -9,7 +9,7 @@ TODO
 * [x] Create stylesheet
 * [x] Add a progress bar
 * [-] Accurately get username
-* [ ] Multiple pages of Creations
+* [x] Multiple pages of Creations
 * [x] ~~**BUG:** Pictures are displayed in reverse order~~ (Fixed)
 * [ ] Fix display of tags
 
