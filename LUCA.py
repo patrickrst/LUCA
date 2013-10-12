@@ -30,11 +30,14 @@ majver = "1.0"
 minver = ""
 
 
-def charCheck(text):
+def charCheck(text, folders=False):
     """Checks for illegal characters in text"""
-    # List of all illegal characters
-    illegal_chars = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
+    # List of illegal characters for filenames
+    illegal_chars = ["\\", "/", ":", "*", "?", '"', "'", "<", ">", "|"]
 
+    if folders:
+        illegal_chars.append(".")
+    #print(illegal_chars)
     found_chars = []
 
     # Get the length of the text, minus one for proper indexing
@@ -59,14 +62,13 @@ def charCheck(text):
             found_chars.append(text[len_of_text])
             len_of_text -= 1
 
-    # An illegal character was found
+    # A(n) illegal character(s) was found
     if illa:
-
-        # Assign variable containing the illegal character
-        return (True, found_chars)
-
-    # Return False only if no illegal character is found
-    return (False, None)
+        for char in found_chars:
+            # Replace it (them) with a space
+            text = text.replace(char, "-")
+        return text
+    return text
 
 
 def searchUser(username, take2=False):
@@ -145,6 +147,7 @@ def searchUser(username, take2=False):
             memberid = checkUser(localUserName, onlineUserName, url, onlineUserNamezero, take2=True)
             return (memberid, url)
 
+
 def checkUser(locuser1, webuser1, url, webuser0=None, take2=False):
     """Checks if this is the proper username"""
     # Create string versions of the usernames
@@ -220,8 +223,6 @@ def checkUser(locuser1, webuser1, url, webuser0=None, take2=False):
                     input("\nPress Enter to close LUCA.")
                     raise SystemExit(0)
 
-
-
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
 localUserName = input("\nEnter your Creation Lab Username: ")
@@ -251,7 +252,8 @@ for creation in creations:
     r = requests.get(creation).content
     soup = BeautifulSoup(r)
 
-    title = soup.find_all('h1')[2]   # add .string to get only the text
+    title = soup.find_all('h1')[2]
+     # add .string to get only the text
     titleString = title.string
     titleString = titleString.replace('/', '')
     titleString = titleString.strip()
@@ -299,21 +301,12 @@ for creation in creations:
 
     # ------- Information Writing ------- #
 
-    # List of illegal characters for filenames
-    blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|"]
-
     # The folders to which the creations will be saved
     mainfilepath = os.path.join(os.getcwd(), localUserName)
-    subfilepath = os.path.join(mainfilepath, titleString)
 
     # Check for illegal characters in the creation title
-    answer, chars = charCheck(titleString)
-
-    # If there were illegal chracters, replace them with a dash
-    if answer:
-        for item in chars:
-            new_titleString = titleString.replace(item, "-")
-            subfilepath = os.path.join(mainfilepath, new_titleString)
+    subfilepathclean = charCheck(titleString, True)
+    subfilepath = os.path.join(mainfilepath, subfilepathclean)
 
     # If the folder for each Creation does not exist, create it
     if not os.path.exists(subfilepath):
@@ -330,12 +323,7 @@ for creation in creations:
         filename = "{0}{1}".format(titleString, i)
 
         # Check for illegal characters in the filenames
-        reply, letters = charCheck(filename)
-
-        # If an illegal character is found, replace it with a dash
-        if reply:
-            for item in letters:
-                filename = filename.replace(item, "-")
+        filename = charCheck(filename)
 
         # Write all non-HTML files.
         with open(os.path.join(subfilepath, filename), 'wb') as newImg:
@@ -447,12 +435,7 @@ https://github.com/Brickever/LUCA#readme -->
     HTMLfilename = "{0}.html".format(titleString)
 
     # Check for illegal characters in the filenames
-    response, symbol = charCheck(HTMLfilename)
-
-    # If an illegal character is found, replace it with a dash
-    if response:
-        for piece in symbol:
-            HTMLfilename = HTMLfilename.replace(piece, "-")
+    HTMLfilename = charCheck(HTMLfilename)
 
     # Write initial HTML document structure
     with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:

@@ -45,6 +45,7 @@ _Released Unknown_
 * Created HTML stylesheet
 * Show more Creations in search results
 * Improved chances of finding a username
+* Properly filter illegal characters in folder names
 
 0.3
 ---
