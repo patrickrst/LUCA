@@ -441,18 +441,19 @@ https://github.com/Brickever/LUCA#readme -->
     with open(os.path.join(subfilepath, HTMLfilename), "wt") as newHTML:
         newHTML.write(page)
 
-    while img_num > -1:
+    im = 0
+    while im < img_num + 1:
 
         # Code to display every image
         img_display = '''
 <a title="Click for larger image" href="{0}"><img src="{0}" width="300" /></a>'''.format(
-            image_list[img_num])
+            image_list[im])
 
         # Write the HTML for the images
         with open(os.path.join(subfilepath, HTMLfilename), "at") as updateHTML:
             updateHTML.write("{0}".format(img_display))
         # Display each image once
-        img_num -= 1
+        im += 1
 
     # Write the final HTML code
     with open(os.path.join(subfilepath, HTMLfilename), "at") as finishHTML:

@@ -46,6 +46,7 @@ _Released Unknown_
 * Show more Creations in search results
 * Improved chances of finding a username
 * Properly filter illegal characters in folder names
+* Display images in proper order
 
 0.3
 ---
