@@ -205,74 +205,84 @@ Rating''', "")
 
 def checkUser(locuser1, webuser1, webuser0=None, take2=False):
     """Checks if this is the proper username"""
-    # Create string versions of the usernames
-    locuser1 = str(locuser1)
+    # We are using the first query results
+    if not take2:
+        print("not take2")
 
-    # The username entered matched index 1,
-    # begin downloading the creations
-    if locuser1.lower() == webuser1.string.lower():
-        #print("match 1")
-        memberid = webuser1.get('href')[63:99]
-        return memberid
+        # The username entered matched index 1,
+        # begin downloading the creations
+        if locuser1.lower() == webuser1.string.lower():
+            print("match 1")
+            memberid = webuser1.get('href')[63:99]
+            return memberid
 
-    # Index 1 does not contiain the username
-    else:
-        #print("fail 1")
+        # Index 1 does not contiain the username
+        else:
+            print("fail 1")
 
-        # If the secondary names are not provided
-        if webuser0 is None:
-            #print(None)
+            # If the secondary name are not provided
+            if webuser0 is None:
+                print("webuser0 is None")
 
-            # Search again, using a different query
-            if not take2:
-                #print("not take2")
+                # Search again, using a different query
                 searchUser(locuser1, take2=True)
 
-            # The name could not be found, close LUCA.
-            elif take2:
-                #print("take2")
+            elif webuser0 is not None:
+                print("webuser0 is not None")
 
                 # The secondary username entered matched index 0,
                 # begin downloading the creations
                 if locuser1.lower() == webuser0.string.lower():
-                    #print("match 2")
+                    print("match 2")
                     memberid = webuser0.get('href')[63:99]
                     return memberid
+
+                # The secondary names could not be found, close LUCA.
                 else:
+                    print("fail 2")
                     print('The username "{0}" does not appear to match with any usernames online.'
                           .format(localUserName))
                     input("\nPress Enter to close LUCA.")
                     raise SystemExit(0)
 
-        elif webuser0 is not None:
-            #print("Not None")
+    # We are using the second query results
+    elif take2:
+        print("take2")
 
-            # The secondary username entered matched index 0,
-            # begin downloading the creations
-            print(locuser1, webuser0)
-            if locuser1.lower() == webuser0.string.lower():
-                #print("match 2")
-                print(locuser1, webuser0.string)
-                memberid = webuser0.get('href')[63:99]
-                return memberid
+        # The username entered matched index 1,
+        # begin downloading the creations
+        if locuser1.lower() == webuser1.string.lower():
+            print("match 1")
+            memberid = webuser1.get('href')[63:99]
+            return memberid
 
-            # The secondary names could not be found, close LUCA.
-            else:
-                #print("fail 2")
-                # Search again, using a different query
-                if not take2:
-                    searchUser(locuser1, take2=True)
+        # Index 1 does not contiain the username
+        else:
+            print("fail 1")
 
-                    # The secondary username entered matched index 0,
+            # If the secondary name are not provided
+            if webuser0 is None:
+                print("webuser0 is None")
+
+                print("final fail")
+                print('The username "{0}" does not appear to match with any usernames online.'
+                      .format(localUserName))
+                input("\nPress Enter to close LUCA.")
+                raise SystemExit(0)
+
+            elif webuser0 is not None:
+                print("webuser0 is not None")
+
+                # The secondary username entered matched index 0,
                 # begin downloading the creations
                 if locuser1.lower() == webuser0.string.lower():
-                    #print("match 2")
+                    print("match 2")
                     memberid = webuser0.get('href')[63:99]
                     return memberid
 
+                # The secondary names could not be found, close LUCA.
                 else:
                     print("final fail")
-                    # The name could not be found, close LUCA.
                     print('The username "{0}" does not appear to match with any usernames online.'
                           .format(localUserName))
                     input("\nPress Enter to close LUCA.")

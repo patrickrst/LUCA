@@ -11,7 +11,7 @@ TODO
 * [-] Accurately get username
 * [x] Multiple pages of Creations
 * [x] ~~**BUG:** Pictures are displayed in reverse order~~ (Fixed)
-* [ ] Fix display of tags
+* [x] Fix display of tags
 
 ### Legend ###
 * [ ] ---> Todo
