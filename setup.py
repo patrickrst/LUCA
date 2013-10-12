@@ -31,6 +31,7 @@ else:
     destfolder = "Builds/Windows64"
 
 build_exe_options = {"build_exe": destfolder,
+                    "icon": "LUCAIcon.ico",
                     "include_files": [
                     "LICENSE",
                     "README.md",
