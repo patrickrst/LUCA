@@ -10,6 +10,7 @@ TODO
 * [x] Add a progress bar
 * [-] Accurately get username
 * [ ] Multiple pages of Creations
+* [ ] **BUG:** Pictures are displayed in reverse order
 
 ### Legend ###
 * [ ] ---> Todo
