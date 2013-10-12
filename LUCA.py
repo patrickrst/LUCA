@@ -75,10 +75,10 @@ def searchUser(username, take2=False):
     if take2:
         url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48".format(
         localUserName)
-
-    # Search the username on the Creation Lab
-    url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48".format(
-        localUserName)
+    else:
+        # Search the username on the Creation Lab
+        url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48".format(
+            localUserName)
 
     r = requests.get(url).content
     soup = BeautifulSoup(r)
@@ -95,21 +95,28 @@ def searchUser(username, take2=False):
         input("\nPress Enter to close LUCA.")
         raise SystemExit(0)
 
-    # Check if one link contains the localUserName
-    try:
-        r = requests.get(creations[1]).content
+    """
+    Index 1 gives the best chance of finding the username,
+    but index 0 is needed for those who uploaded very few Creations.
+    """
 
-    # Index 1 gives the best chance of finding the username,
-    # but index 0 is needed for those who uploaded very few Creations
-    except IndexError:
-        r = requests.get(creations[0]).content
+    # Check if index 1 contains the localUserName
+    #FIXME: This can throw an IndexError
+    r1 = requests.get(creations[1]).content
+    # Check if index 0 contains the localUserName
+    rzero = requests.get(creations[0]).content
 
-    # Get the username
-    soup = BeautifulSoup(r)
-    onlineUserName = soup.find(
+    # Get the username from index 1
+    soup1 = BeautifulSoup(r1)
+    onlineUserName = soup1.find(
         id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
 
-    # The username entered matched the one online,
+    # Get the username from index 0
+    soupzero = BeautifulSoup(rzero)
+    onlineUserNamezero = soupzero.find(
+        id="ctl00_ContentPlaceHolderUniverse_HyperLinkUsername")
+
+    # The username entered matched index 1,
     # begin downloading the creations
     if localUserName.lower() == onlineUserName.string.lower():
         memberid = onlineUserName.get('href')[63:99]
@@ -117,17 +124,29 @@ def searchUser(username, take2=False):
               localUserName))
         return memberid
 
+    # Index 1 does not contiain the username
     elif localUserName.lower() != onlineUserName.string.lower():
-        # Search again, using a different query
-        if not take2:
-            searchUser(username, take2=True)
 
-        # The name could not be found, close LUCA.
-        else:
-            print('The username "{0}" does not appear to match with any usernames online.'
-                  .format(localUserName))
-            input("\nPress Enter to close LUCA.")
-            raise SystemExit(0)
+        # The username entered matched index 0,
+        # begin downloading the creations
+        if localUserName.lower() == onlineUserNamezero.string.lower():
+            memberid = onlineUserNamezero.get('href')[63:99]
+            print("\nYour Creations are now downloading, {0}.\n".format(
+                localUserName))
+            return memberid
+
+        # Index 0 does not contiain the username
+        elif localUserName.lower() != onlineUserNamezero.string.lower():
+            # Search again, using a different query
+            if not take2:
+                searchUser(username, take2=True)
+
+            # The name could not be found, close LUCA.
+            else:
+                print('The username "{0}" does not appear to match with any usernames online.'
+                      .format(localUserName))
+                input("\nPress Enter to close LUCA.")
+                raise SystemExit(0)
 
 # Write window title
 os.system("title {0} v{1}".format(app, majver))
