@@ -76,7 +76,7 @@ def searchUser(username, take2=False):
     # Backup search method for finding the username on the Creation Lab
     if take2:
         url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&show=48&page={1}".format(
-        localUserName, num_of_pages)
+            localUserName, num_of_pages)
     else:
         # Search the username on the Creation Lab
         url = "http://universe.lego.com/en-us/community/creationlab/displaycreationlist.aspx?SearchText={0}&order=oldest&show=48&page={1}".format(
@@ -124,7 +124,8 @@ Rating''', "")
     # Add the creations from page 1 to the list
     for link in soup.find_all('a'):
         if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-            creations.append('http://universe.lego.com{0}'.format(link.get('href')))
+            creations.append('http://universe.lego.com{0}'.format(
+                link.get('href')))
 
     # If there is more than one page of Creations,
     # add the creations from the other pages to the list
@@ -138,7 +139,8 @@ Rating''', "")
             soup = BeautifulSoup(req)
             for link in soup.find_all('a'):
                 if link.get('href')[0:49] == "/en-us/Community/CreationLab/DisplayCreation.aspx":
-                    creations.append('http://universe.lego.com{0}'.format(link.get('href')))
+                    creations.append('http://universe.lego.com{0}'.format(
+                        link.get('href')))
 
     # Check if links were found/added for the entered username
     # If not, close LUCA
@@ -184,7 +186,7 @@ Rating''', "")
         # There is only one name to check
         elif r1 is not None:
             checkUser(localUserName, onlineUserName,
-                                 onlineUserNamezero)
+                      onlineUserNamezero)
             return creations
 
     # This is the second search
@@ -197,7 +199,7 @@ Rating''', "")
         # There is only one name to check
         elif r1 is not None:
             checkUser(localUserName, onlineUserName,
-                                 onlineUserNamezero, take2=True)
+                      onlineUserNamezero, take2=True)
             return creations
 
 
@@ -323,9 +325,10 @@ for creation in creations:
 
     # Update and fix original HTML errors
     title_str = title_str.replace("</h1>", "")
-    title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h2>'.format(
+    title_str = '{0} - Created by <a target="_blank" href="{1}{2}.aspx">{2}</a></h1>'.format(
         title_str, "http://mln.lego.com/en-us/PublicView/", localUserName)
-    description_str = description_str.replace("</br></br></br></br></br></br>", "")
+    description_str = description_str.replace("</br></br></br></br></br></br>",
+                                              "")
     description_str = description_str.replace("\t\t\t\t\t\t\t\t\t", "")
     description_str = description_str.replace('''
 \t\t\t\t\t\t\t\t''', "")
@@ -338,6 +341,9 @@ for creation in creations:
 <p>''', "")
     date_str = date_str.replace('''
 ''', "")
+    tags_str = tags_str.replace(r'<a href="',
+                                r'<<a target="_blank" href="http://universe.lego.com/en-us/community/creationlab/')
+    date_str = date_str.replace(r"</div>", "")
 
     # List of non-HTML files to download
     imgLinkList = []
@@ -346,8 +352,9 @@ for creation in creations:
     # Populate the list
     for imgLink in soup.find_all('a'):
         if imgLink.get('href')[0:13] == "GetMedia.aspx":
-            imgLinkList.append('http://universe.lego.com/en-us/community/creationlab/{0}'
-                               .format(imgLink.get('href')))
+            imgLinkList.append(
+                'http://universe.lego.com/en-us/community/creationlab/{0}'
+                .format(imgLink.get('href')))
 
     # ------- Information Writing ------- #
 
@@ -441,8 +448,8 @@ for creation in creations:
         except UnicodeEncodeError:
             print("Filename display error. Creation saved!")
             pass
-        i += 1
 
+        i += 1
         image_list.append(new_filename)
         img_num = len(image_list)
 
@@ -454,33 +461,39 @@ https://github.com/le717/LUCA#readme -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>{1}</title>
-<style>
-{2}
-{3}
-{4}
-{5}
-</style>
+    <meta charset="utf-8" />
+    <title>{1}</title>
+    <style>
+    {2}
+    {3}
+    {4}
+    {5}
+    </style>
 </head>
 <body>
 {6}
 <div class="line-separator"></div>
-<h2>Challenge</h2>
-{8}
-<br>Submitted {9}
 
+<h2>Challenge</h2>
+<p>{8}
+<br>Submitted {9}
 <div class="line-separator"></div>
+
 <h2>Description</h2>
 {10}
+
 <h2>Images</h2>
 <div id="pictures">'''.format(
         time.strftime("%c", time.gmtime()), titleString,
         "body { background-color: #212121; color: white; text-align: center;}",
         "h1, h2 {font-family: sans-serif; }",
-        ".line-separator{ height:1px; background:#717171; border-bottom:1px solid #313030; }",
+        '''.line-separator {
+    height:1px; background:#717171;
+    border-bottom:1px solid #313030;
+    }''',
         "a { color: #A9A9A9; text-decoration: none;}",
-        title_str, localUserName, challenge, date_str, description_str, majver)
+        title_str, localUserName, challenge, date_str, description_str,
+        majver)
 
     # Original HTML filename
     HTMLfilename = "{0}.html".format(titleString)
@@ -513,12 +526,14 @@ https://github.com/le717/LUCA#readme -->
 <br>
 <div class="line-separator"></div>
 <br>
-Original Creation Link:
+Original Creation Link
 <br>
 <a href="{0}" target="_blank">{0}</a>
 <br>
 <br>
-Tags {1}
+Tags
+<br>
+{1}
 </body>
 </html>
 '''.format(creation, tags_str)))

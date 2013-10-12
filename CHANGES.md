@@ -52,6 +52,9 @@ _Released Unknown_
 * Download all Creations by a user (fixes multiple pages bug)
 * Added app icon (`LUCAIcon.ico`)
 * Rename `LICENSE` to `LICENSE.txt`
+* Fixed display of tags
+* Various HTML fixes
+* PEP 8 checks
 
 0.3
 ---
