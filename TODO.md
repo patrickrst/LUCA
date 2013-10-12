@@ -1,15 +1,19 @@
 TODO
 ====
 * [ ] ~~Filter user input~~ (Not needed)
-* [-] Handle error
+* [-] Handle all errors
 * [x] Remove illegal characters in downloaded creations
-* [ ] Distinguish between images, videos and LDD files
+* [x] Distinguish between images, videos and LDD files
 * [x] Work with username as an input (instead of memberid)
-* [ ] Add creation comments to the HTML file
-* [ ] Create stylesheet
+* [ ] ~~Add creation comments to the HTML file~~ (Not possible)
+* [x] Create stylesheet
 * [x] Add a progress bar
+* [-] Accurately get username
+* [x] Multiple pages of Creations
+* [x] ~~**BUG:** Pictures are displayed in reverse order~~ (Fixed)
+* [x] Fix display of tags
 
-###Legend
+### Legend ###
 * [ ] ---> Todo
 * [-] ---> Partially done
 * [x] ---> Done
